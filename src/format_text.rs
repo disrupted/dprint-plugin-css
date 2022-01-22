@@ -2,11 +2,28 @@ use super::configuration::Configuration;
 
 use anyhow::Result;
 use dprint_core::configuration::resolve_new_line_kind;
+use parcel_css::stylesheet::{ParserOptions, PrinterOptions, StyleSheet};
 use std::path::Path;
 
+const PARSER_OPTS: ParserOptions = ParserOptions {
+    nesting: true,
+    css_modules: false,
+    custom_media: false,
+};
+const PRINTER_OPTS: PrinterOptions = PrinterOptions {
+    minify: false,
+    source_map: false,
+    analyze_dependencies: false,
+    targets: None,
+    pseudo_classes: None,
+};
+
 pub fn format_text(_file_path: &Path, text: &str, config: &Configuration) -> Result<String> {
-    // TODO: format
-    let text = text.to_string();
+    let filename = "".to_string();
+    // TODO: get rid of unwrap
+    let stylesheet = StyleSheet::parse(filename, text, PARSER_OPTS).unwrap();
+    let css = stylesheet.to_css(PRINTER_OPTS).unwrap();
+    let text = css.code;
 
     // ensure ends with newline
     let text = if !text.ends_with('\n') {

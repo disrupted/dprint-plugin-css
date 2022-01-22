@@ -10,7 +10,7 @@ struct CssPluginHandler {}
 
 impl CssPluginHandler {
     pub const fn new() -> Self {
-        Self {}
+        CssPluginHandler {}
     }
 }
 

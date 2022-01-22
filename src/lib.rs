@@ -1,8 +1,12 @@
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
-    }
-}
+pub mod configuration;
+mod format_text;
+
+pub use format_text::format_text;
+
+#[cfg(feature = "wasm")]
+#[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
+mod wasm_plugin;
+
+#[cfg(feature = "wasm")]
+#[cfg(all(target_arch = "wasm32", target_os = "unknown"))]
+pub use wasm_plugin::*;

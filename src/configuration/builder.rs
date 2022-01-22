@@ -92,7 +92,7 @@ mod tests {
             .indent_width(4);
 
         let inner_config = config.get_inner_config();
-        assert_eq!(inner_config.len(), 5);
+        assert_eq!(inner_config.len(), 3);
         let diagnostics = resolve_config(
             inner_config,
             &resolve_global_config(HashMap::new(), &Default::default()).config,

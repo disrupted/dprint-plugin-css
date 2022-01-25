@@ -21,7 +21,13 @@ const PRINTER_OPTS: PrinterOptions = PrinterOptions {
 pub fn format_text(_file_path: &Path, text: &str, config: &Configuration) -> Result<String> {
     let filename = "".to_string();
     // TODO: get rid of unwrap
-    let stylesheet = StyleSheet::parse(filename, text, PARSER_OPTS).unwrap();
+    let stylesheet = match StyleSheet::parse(filename, text, PARSER_OPTS) {
+        Ok(v) => v,
+        Err(_) => {
+            eprintln!("Error parsing file");
+            std::process::exit(1);
+        }
+    };
     let css = stylesheet.to_css(PRINTER_OPTS).unwrap();
     let text = css.code;
 

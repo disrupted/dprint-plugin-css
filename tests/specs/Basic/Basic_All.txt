@@ -1,0 +1,7 @@
+== should format basic ==
+body{color:black}
+
+[expect]
+body {
+  color: #000;
+}

@@ -1,0 +1,12 @@
+{
+  "incremental": true,
+  "css": {
+  },
+  "includes": [
+    "**/*.{css}"
+  ],
+  "excludes": [],
+  "plugins": [
+    "target/wasm32-unknown-unknown/release/dprint_plugin_css.wasm"
+  ]
+}

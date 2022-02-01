@@ -31,8 +31,14 @@ impl PluginHandler<Configuration> for CssPluginHandler {
             config_key: "css".to_string(),
             file_extensions: vec!["css".to_string()],
             file_names: vec![],
-            help_url: "https://dprint.dev/plugins/css".to_string(),
-            config_schema_url: "".to_string(),
+            help_url: "https://github.com/disrupted/dprint-plugin-css/issues".to_string(),
+            config_schema_url: format!(
+                "https://plugins.dprint.dev/disrupted/dprint-plugin-css/{}/schema.json",
+                version
+            ),
+            update_url: Some(
+                "https://plugins.dprint.dev/disrupted/dprint-plugin-css/latest.json".to_string(),
+            ),
         }
     }
 

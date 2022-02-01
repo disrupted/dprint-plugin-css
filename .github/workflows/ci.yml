@@ -1,0 +1,84 @@
+name: CI
+# taken from main dprint plugins
+# without npm for now
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: ${{ matrix.config.kind }} ${{ matrix.config.os }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      matrix:
+        config:
+          - os: ubuntu-latest
+            kind: test_release
+          - os: ubuntu-latest
+            kind: test_debug
+
+    env:
+      CARGO_INCREMENTAL: 0
+      RUST_BACKTRACE: full
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: 1.57.0
+          override: true
+      - name: Install wasm32 target
+        if: matrix.config.kind == 'test_release'
+        run: rustup target add wasm32-unknown-unknown
+
+      - name: Cache cargo
+        if: startsWith(github.ref, 'refs/tags/') != true
+        uses: Swatinem/rust-cache@v1
+
+      - name: Build debug
+        if: matrix.config.kind == 'test_debug'
+        run: cargo build --verbose
+      - name: Build release
+        if: matrix.config.kind == 'test_release'
+        run: cargo build --target wasm32-unknown-unknown --features wasm --release --verbose
+
+      - name: Test debug
+        if: matrix.config.kind == 'test_debug'
+        run: cargo test --verbose
+      - name: Test release
+        if: matrix.config.kind == 'test_release'
+        run: cargo test --release --verbose
+
+      - name: Get tag version
+        if: matrix.config.kind == 'test_release' && startsWith(github.ref, 'refs/tags/')
+        id: get_tag_version
+        run: echo ::set-output name=TAG_VERSION::${GITHUB_REF/refs\/tags\//}
+
+        # CARGO PUBLISH
+      - name: Cargo login
+        if: matrix.config.kind == 'test_release' && startsWith(github.ref, 'refs/tags/')
+        run: cargo login ${{ secrets.CRATES_TOKEN }}
+
+      - name: Cargo publish
+        if: matrix.config.kind == 'test_release' && startsWith(github.ref, 'refs/tags/')
+        run: cargo publish
+
+        # GITHUB RELEASE
+      - name: Pre-release
+        if: matrix.config.kind == 'test_release' && startsWith(github.ref, 'refs/tags/')
+        run: |
+          # update config schema to have version
+          sed -i 's/0.0.0/${{ steps.get_tag_version.outputs.TAG_VERSION }}/' deployment/schema.json
+          # rename the wasm file
+          (cd target/wasm32-unknown-unknown/release/ && mv dprint_plugin_css.wasm plugin.wasm)
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: matrix.config.kind == 'test_release' && startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: |
+            target/wasm32-unknown-unknown/release/plugin.wasm
+            deployment/schema.json
+          body: ""
+          draft: false

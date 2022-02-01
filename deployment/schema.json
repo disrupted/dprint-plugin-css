@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://github.com/disrupted/dprint-plugin-css/raw/0.0.0/deployment/schema.json",
+  "$id": "https://plugins.dprint.dev/disrupted/dprint-plugin-css/0.0.0/schema.json",
   "type": "object",
   "definitions": {
     "useTabs": {

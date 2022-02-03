@@ -2,12 +2,12 @@ use parcel_css::rules::media::MediaRule;
 use parcel_css::rules::CssRule;
 
 #[derive(Clone)]
-pub enum Node<'a, 'i> {
-    Media(&'a MediaRule<'i>),
+pub enum Node<'a> {
+    Media(&'a MediaRule<'a>),
 }
 
-impl<'a, 'i> From<&'a CssRule<'i>> for Node<'a, 'i> {
-    fn from(rule: &'a CssRule<'i>) -> Node<'a, 'i> {
+impl<'a> From<&'a CssRule<'a>> for Node<'a> {
+    fn from(rule: &'a CssRule<'a>) -> Node<'a> {
         match rule {
             CssRule::Media(media) => Node::Media(media),
             CssRule::Import(_) => todo!(),

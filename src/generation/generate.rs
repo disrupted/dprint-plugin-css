@@ -7,7 +7,11 @@ use super::helpers::*;
 use crate::configuration::Configuration;
 use parcel_css::stylesheet::StyleSheet;
 
-pub fn generate(file: &StyleSheet, text: &str, config: &Configuration) -> PrintItems {
+pub fn generate<'i>(
+    file: &'i StyleSheet<'i>,
+    text: &'i str,
+    config: &'i Configuration,
+) -> PrintItems {
     let mut context = Context::new(text, file, config);
     let mut items = PrintItems::new();
     let top_level_nodes =
@@ -16,12 +20,12 @@ pub fn generate(file: &StyleSheet, text: &str, config: &Configuration) -> PrintI
     for (i, node) in top_level_nodes.iter().enumerate() {
         items.extend(gen_node(node.clone(), &mut context));
         items.push_signal(Signal::NewLine);
-        if let Some(next_node) = top_level_nodes.get(i + 1) {
-            let text_between = &text[node.span().end..next_node.span().start];
-            if text_between.chars().filter(|c| *c == '\n').count() > 1 {
-                items.push_signal(Signal::NewLine);
-            }
-        }
+        // if let Some(next_node) = top_level_nodes.get(i + 1) {
+        //     let text_between = &text[node.span().end..next_node.span().start];
+        //     if text_between.chars().filter(|c| *c == '\n').count() > 1 {
+        //         items.push_signal(Signal::NewLine);
+        //     }
+        // }
     }
 
     items
@@ -55,16 +59,15 @@ fn gen_node<'a>(node: Node<'a>, context: &mut Context<'a>) -> PrintItems {
     items
 }
 
-fn gen_media_instruction<'a>(node: &'a MediaRule, context: &mut Context<'a>) -> PrintItems {
+fn gen_media_instruction<'a>(node: &'a MediaRule<'a>, context: &mut Context<'a>) -> PrintItems {
     let mut items = PrintItems::new();
 
     items.push_str("ARG ");
-    items.extend(gen_node((&node.name).into(), context));
-
-    if let Some(value) = &node.value {
-        items.push_str("=");
-        items.extend(gen_node(value.into(), context));
-    }
+    node.rules
+        .0
+        .iter()
+        .map(|i| i.into())
+        .for_each(|rule| items.extend(gen_node(rule, context)));
 
     items
 }

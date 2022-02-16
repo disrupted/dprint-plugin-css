@@ -7,14 +7,15 @@ use std::path::Path;
 
 const PARSER_OPTS: ParserOptions = ParserOptions {
     nesting: true,
-    css_modules: false,
     custom_media: false,
+    css_modules: false,
+    source_index: 0,
 };
 const PRINTER_OPTS: PrinterOptions = PrinterOptions {
     minify: false,
-    source_map: false,
-    analyze_dependencies: false,
+    source_map: None,
     targets: None,
+    analyze_dependencies: false,
     pseudo_classes: None,
 };
 

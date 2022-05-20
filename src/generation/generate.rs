@@ -7,11 +7,7 @@ use super::helpers::*;
 use crate::configuration::Configuration;
 use parcel_css::stylesheet::StyleSheet;
 
-pub fn generate<'i>(
-    file: &'i StyleSheet<'i>,
-    text: &'i str,
-    config: &'i Configuration,
-) -> PrintItems {
+pub fn generate<'i>(file: StyleSheet<'i>, text: &'i str, config: &'i Configuration) -> PrintItems {
     let mut context = Context::new(text, file, config);
     let mut items = PrintItems::new();
     let top_level_nodes =
@@ -34,7 +30,7 @@ pub fn generate<'i>(
 fn gen_node<'a>(node: Node<'a>, context: &mut Context<'a>) -> PrintItems {
     let mut items = PrintItems::new();
 
-    context.set_current_node(node.clone());
+    // context.set_current_node(node.clone());
     items.extend(match node {
         Node::Media(node) => gen_media_instruction(&node, context),
         // Node::Arg(node) => gen_arg_instruction(node, context),
@@ -55,7 +51,7 @@ fn gen_node<'a>(node: Node<'a>, context: &mut Context<'a>) -> PrintItems {
         // Node::CommentRc(node) => gen_comment(&node, context),
         // Node::Comment(node) => gen_comment(node, context),
     });
-    context.pop_current_node();
+    // context.pop_current_node();
     items
 }
 

@@ -7,7 +7,7 @@ use crate::configuration::Configuration;
 
 pub struct Context<'a> {
     pub config: &'a Configuration,
-    pub stylesheet: &'a StyleSheet<'a>,
+    pub stylesheet: StyleSheet<'a>,
     pub text: &'a str,
     pub handled_comments: HashSet<usize>,
     current_node: Option<Node<'a>>,
@@ -16,7 +16,7 @@ pub struct Context<'a> {
 }
 
 impl<'a> Context<'a> {
-    pub fn new(text: &'a str, stylesheet: &'a StyleSheet<'a>, config: &'a Configuration) -> Self {
+    pub fn new(text: &'a str, stylesheet: StyleSheet<'a>, config: &'a Configuration) -> Self {
         Self {
             config,
             text,

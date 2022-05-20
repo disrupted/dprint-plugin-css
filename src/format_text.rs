@@ -11,10 +11,11 @@ const PARSER_OPTS: ParserOptions = ParserOptions {
     nesting: true,
     css_modules: false,
     custom_media: false,
+    source_index: 0,
 };
 const PRINTER_OPTS: PrinterOptions = PrinterOptions {
     minify: false,
-    source_map: false,
+    source_map: None,
     analyze_dependencies: false,
     targets: None,
     pseudo_classes: None,
@@ -24,7 +25,7 @@ pub fn format_text(_file_path: &Path, text: &str, config: &Configuration) -> Res
     let node = parse_node(text)?;
 
     Ok(dprint_core::formatting::format(
-        || generate(&node, text, config),
+        || generate(node, text, config),
         config_to_print_options(text, config),
     ))
 }

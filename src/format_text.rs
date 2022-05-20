@@ -20,8 +20,7 @@ const PRINTER_OPTS: PrinterOptions = PrinterOptions {
 };
 
 pub fn format_text(_file_path: &Path, text: &str, config: &Configuration) -> Result<String> {
-    let filename = "".to_string();
-    // TODO: get rid of unwrap
+    let filename = "";
     let stylesheet = match StyleSheet::parse(filename, text, PARSER_OPTS) {
         Ok(v) => v,
         Err(_) => {
@@ -47,7 +46,7 @@ pub fn format_text(_file_path: &Path, text: &str, config: &Configuration) -> Res
             text.replace("\r\n", "\n")
         } else {
             // lazy
-            text.replace("\r\n", "\n").replace("\n", "\r\n")
+            text.replace("\r\n", "\n").replace('\n', "\r\n")
         },
     )
 }

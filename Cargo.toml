@@ -6,7 +6,7 @@ edition = "2021"
 keywords = ["formatting", "formatter", "css"]
 license = "MIT"
 repository = "https://github.com/disrupted/dprint-plugin-css"
-description = "CSS formatter for dprint via parcel_css."
+description = "CSS formatter for dprint via lightningcss."
 
 [lib]
 crate-type = ["lib", "cdylib"]

@@ -2,7 +2,7 @@ use super::configuration::Configuration;
 
 use anyhow::Result;
 use dprint_core::configuration::resolve_new_line_kind;
-use parcel_css::stylesheet::{ParserOptions, PrinterOptions, StyleSheet};
+use lightningcss::stylesheet::{ParserOptions, PrinterOptions, StyleSheet};
 use std::path::Path;
 
 const PRINTER_OPTS: PrinterOptions = PrinterOptions {

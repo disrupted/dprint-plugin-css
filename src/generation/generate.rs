@@ -1,6 +1,8 @@
 // use dprint_core::formatting::ir_helpers::gen_from_raw_string;
 use dprint_core::formatting::*;
-use raffia::ast::{Declaration, QualifiedRule, Statement, Stylesheet};
+use raffia::ast::{
+    ComplexSelectorChild, Declaration, QualifiedRule, Statement, Stylesheet, WqName,
+};
 
 use super::context::Context;
 use super::helpers::*;
@@ -80,30 +82,42 @@ fn gen_declaration_instruction<'a>(node: Declaration<'a>, context: &mut Context<
 }
 
 fn gen_rule_instruction<'a>(node: QualifiedRule<'a>, context: &mut Context<'a>) -> PrintItems {
-    println!("{:#?}", node);
     let mut items = PrintItems::new();
 
-    items.push_str("RULE ");
-    let name = &node
-        .selector
-        .selectors
-        .first()
-        .unwrap()
-        .children
-        .first()
-        .unwrap()
-        .as_compound_selector()
-        .unwrap()
-        .children
-        .first()
-        .unwrap()
-        .as_type()
-        .unwrap()
-        .as_tag_name()
-        .unwrap()
-        .name;
-    items.push_str(name.name.as_literal().unwrap().raw);
-    items.push_str(" ");
+    items.push_str("RULE");
+    items.push_signal(Signal::NewLine);
+    let sel = &node.selector.selectors;
+    let complex_selectors: Vec<&ComplexSelectorChild> =
+        sel.iter().map(|s| s.children.first().unwrap()).collect();
+    let wq_names: Vec<&WqName> = complex_selectors
+        .iter()
+        .map(|s| {
+            &s.as_compound_selector()
+                .unwrap()
+                .children
+                .first()
+                .unwrap()
+                .as_type()
+                .unwrap()
+                .as_tag_name()
+                .unwrap()
+                .name
+        })
+        .collect();
+    let names: Vec<&str> = wq_names
+        .iter()
+        .map(|n| n.name.as_literal().unwrap().raw)
+        .collect();
+
+    // items.push_str(&names.join(", "));
+    for (i, name) in names.iter().enumerate() {
+        items.push_str(name);
+        if i != names.len() - 1 {
+            items.push_str(",");
+            items.push_signal(Signal::NewLine);
+        }
+    }
+    items.push_str(" {}");
     items.push_str(&node.block.statements.len().to_string());
     // node.statements
     //     .iter()

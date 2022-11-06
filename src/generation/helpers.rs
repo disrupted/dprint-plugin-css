@@ -23,6 +23,12 @@ impl<'a> From<&'a CssRule<'a>> for Node<'a> {
             CssRule::Viewport(_) => todo!(),
             CssRule::CustomMedia(_) => todo!(),
             CssRule::Ignored => todo!(),
+            CssRule::FontPaletteValues(_) => todo!(),
+            CssRule::LayerStatement(_) => todo!(),
+            CssRule::LayerBlock(_) => todo!(),
+            CssRule::Property(_) => todo!(),
+            CssRule::Container(_) => todo!(),
+            CssRule::Unknown(_) => todo!(),
         }
     }
 }

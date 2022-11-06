@@ -25,7 +25,7 @@ fn parse_node(text: &str) -> Result<Stylesheet> {
 
 fn config_to_print_options(text: &str, config: &Configuration) -> PrintOptions {
     PrintOptions {
-        indent_width: 1,
+        indent_width: 2,
         max_width: 80,
         use_tabs: false,
         new_line_text: resolve_new_line_kind(text, config.new_line_kind),

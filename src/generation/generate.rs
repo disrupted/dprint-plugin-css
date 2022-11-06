@@ -97,6 +97,9 @@ fn gen_rule_instruction<'a>(node: QualifiedRule<'a>, context: &mut Context<'a>) 
                 .children
                 .first()
                 .unwrap()
+                // .as_class()
+                // .unwrap()
+                // .name
                 .as_type()
                 .unwrap()
                 .as_tag_name()
@@ -117,8 +120,44 @@ fn gen_rule_instruction<'a>(node: QualifiedRule<'a>, context: &mut Context<'a>) 
             items.push_signal(Signal::NewLine);
         }
     }
-    items.push_str(" {}");
-    items.push_str(&node.block.statements.len().to_string());
+
+    // items.push_str(&node.block.statements.len().to_string());
+
+    if node.block.statements.is_empty() {
+        items.push_str(" {}");
+    } else {
+        items.push_str(" {");
+        items.push_signal(Signal::NewLine);
+
+        // parse statements inside block
+        for statement in &node.block.statements {
+            items.extend(ir_helpers::with_indent({
+                let mut items = PrintItems::new();
+                if statement.is_declaration() {
+                    let declaration = statement.as_declaration().unwrap();
+                    let ident = declaration.name.as_literal().unwrap().raw;
+                    items.push_str(ident);
+                    items.push_str(": ");
+
+                    for value in declaration.value.iter() {
+                        if value.is_hex_color() {
+                            items.push_str("#");
+                            items.push_str(&value.as_hex_color().unwrap().value);
+                        }
+                    }
+
+                    if declaration.important.is_some() {
+                        items.push_str(" !important");
+                    }
+                }
+                items.push_str(";");
+                items.push_signal(Signal::NewLine);
+                items
+            }));
+        }
+        items.push_str("}");
+    }
+
     // node.statements
     //     .iter()
     //     .map(|i| i.into())

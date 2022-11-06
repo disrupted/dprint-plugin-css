@@ -34,7 +34,7 @@ fn gen_node<'a>(node: Node<'a>, context: &mut Context<'a>) -> PrintItems {
 
     // context.set_current_node(node.clone());
     items.extend(match node {
-        Node::Media(node) => gen_media_instruction(&node, context),
+        Node::Media(node) => gen_media_instruction(node, context),
         // Node::Arg(node) => gen_arg_instruction(node, context),
         // Node::Cmd(node) => gen_cmd_instruction(node, context),
         // Node::Copy(node) => gen_copy_instruction(node, context),
@@ -57,7 +57,7 @@ fn gen_node<'a>(node: Node<'a>, context: &mut Context<'a>) -> PrintItems {
     items
 }
 
-fn gen_media_instruction<'a>(node: &'a Statement<'a>, context: &mut Context<'a>) -> PrintItems {
+fn gen_media_instruction<'a>(node: Statement<'a>, context: &mut Context<'a>) -> PrintItems {
     let mut items = PrintItems::new();
 
     items.push_str("ARG ");

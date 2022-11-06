@@ -2,7 +2,7 @@ use raffia::ast::Statement;
 
 #[derive(Clone)]
 pub enum Node<'a> {
-    Media(&'a Statement<'a>),
+    Media(Statement<'a>),
 }
 
 impl<'a> From<Statement<'a>> for Node<'a> {

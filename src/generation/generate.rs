@@ -20,12 +20,12 @@ pub fn generate<'a>(file: Stylesheet<'a>, text: &'a str, config: &'a Configurati
     for (i, node) in top_level_nodes.iter().enumerate() {
         items.extend(gen_node(node.clone(), &mut context));
         items.push_signal(Signal::NewLine);
-        // if let Some(next_node) = top_level_nodes.get(i + 1) {
-        //     let text_between = &text[node.span().end..next_node.span().start];
-        //     if text_between.chars().filter(|c| *c == '\n').count() > 1 {
-        //         items.push_signal(Signal::NewLine);
-        //     }
-        // }
+        if let Some(next_node) = top_level_nodes.get(i + 1) {
+            //     let text_between = &text[node.span().end..next_node.span().start];
+            //     if text_between.chars().filter(|c| *c == '\n').count() > 1 {
+            items.push_signal(Signal::NewLine);
+            //     }
+        }
     }
 
     items
@@ -116,7 +116,6 @@ fn gen_rule_instruction<'a>(node: QualifiedRule<'a>, context: &mut Context<'a>) 
         items.push_str(name);
         if i < names.len() - 1 {
             items.push_str(",");
-            items.push_signal(Signal::NewLine);
         }
     }
 

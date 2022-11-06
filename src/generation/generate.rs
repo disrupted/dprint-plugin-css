@@ -1,17 +1,16 @@
 // use dprint_core::formatting::ir_helpers::gen_from_raw_string;
 use dprint_core::formatting::*;
-use lightningcss::rules::media::MediaRule;
+use raffia::ast::{Statement, Stylesheet};
 
 use super::context::Context;
 use super::helpers::*;
 use crate::configuration::Configuration;
-use lightningcss::stylesheet::StyleSheet;
 
-pub fn generate<'i>(file: StyleSheet<'i>, text: &'i str, config: &'i Configuration) -> PrintItems {
+pub fn generate<'i>(file: Stylesheet<'i>, text: &'i str, config: &'i Configuration) -> PrintItems {
     let mut context = Context::new(text, file, config);
     let mut items = PrintItems::new();
     let top_level_nodes =
-        context.gen_nodes_with_comments(0, text.len(), file.rules.0.iter().map(|i| i.into()));
+        context.gen_nodes_with_comments(0, text.len(), file.statements.iter().map(|i| i.into()));
 
     for (i, node) in top_level_nodes.iter().enumerate() {
         items.extend(gen_node(node.clone(), &mut context));
@@ -55,15 +54,14 @@ fn gen_node<'a>(node: Node<'a>, context: &mut Context<'a>) -> PrintItems {
     items
 }
 
-fn gen_media_instruction<'a>(node: &'a MediaRule<'a>, context: &mut Context<'a>) -> PrintItems {
+fn gen_media_instruction<'a>(node: &'a Statement<'a>, context: &mut Context<'a>) -> PrintItems {
     let mut items = PrintItems::new();
 
     items.push_str("ARG ");
-    node.rules
-        .0
-        .iter()
-        .map(|i| i.into())
-        .for_each(|rule| items.extend(gen_node(rule, context)));
+    // node.statements
+    //     .iter()
+    //     .map(|i| i.into())
+    //     .for_each(|rule| items.extend(gen_node(rule, context)));
 
     items
 }

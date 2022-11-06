@@ -1,13 +1,13 @@
 use std::collections::HashSet;
 
-use lightningcss::stylesheet::StyleSheet;
+use raffia::ast::Stylesheet;
 
 use super::helpers::*;
 use crate::configuration::Configuration;
 
 pub struct Context<'a> {
     pub config: &'a Configuration,
-    pub stylesheet: StyleSheet<'a>,
+    pub stylesheet: Stylesheet<'a>,
     pub text: &'a str,
     pub handled_comments: HashSet<usize>,
     current_node: Option<Node<'a>>,
@@ -16,7 +16,7 @@ pub struct Context<'a> {
 }
 
 impl<'a> Context<'a> {
-    pub fn new(text: &'a str, stylesheet: StyleSheet<'a>, config: &'a Configuration) -> Self {
+    pub fn new(text: &'a str, stylesheet: Stylesheet<'a>, config: &'a Configuration) -> Self {
         Self {
             config,
             text,

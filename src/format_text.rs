@@ -1,7 +1,7 @@
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use dprint_core::configuration::resolve_new_line_kind;
 use dprint_core::formatting::PrintOptions;
-use lightningcss::stylesheet::{ParserOptions, StyleSheet};
+use raffia::{ast::Stylesheet, Parser, Syntax};
 use std::path::Path;
 
 use crate::configuration::Configuration;
@@ -16,17 +16,11 @@ pub fn format_text(_file_path: &Path, text: &str, config: &Configuration) -> Res
     ))
 }
 
-fn parse_node(text: &str) -> Result<StyleSheet> {
-    let parser_opts = ParserOptions {
-        nesting: true,
-        custom_media: false,
-        css_modules: None,
-        source_index: 0,
-        filename: String::new(),
-        error_recovery: false,
-        warnings: None,
-    };
-    StyleSheet::parse(text, parser_opts)
+fn parse_node(text: &str) -> Result<Stylesheet> {
+    let mut parser = Parser::new(text, Syntax::Css);
+    parser
+        .parse::<Stylesheet>()
+        .map_err(|err| anyhow!("raffia error")) // TODO
 }
 
 fn config_to_print_options(text: &str, config: &Configuration) -> PrintOptions {

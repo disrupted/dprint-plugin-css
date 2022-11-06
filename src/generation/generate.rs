@@ -36,7 +36,6 @@ fn gen_node<'a>(node: Node<'a>, context: &mut Context<'a>) -> PrintItems {
 
     // context.set_current_node(node.clone());
     items.extend(match node {
-        // _ => gen_debug(context),
         Node::Declaration(node) => gen_declaration_instruction(node, context),
         Node::QualifiedRule(node) => gen_rule_instruction(node, context),
         // Node::Arg(node) => gen_arg_instruction(node, context),
@@ -61,14 +60,6 @@ fn gen_node<'a>(node: Node<'a>, context: &mut Context<'a>) -> PrintItems {
     items
 }
 
-fn gen_debug(context: &mut Context) -> PrintItems {
-    let mut items = PrintItems::new();
-
-    items.push_str("DEBUG ");
-
-    items
-}
-
 fn gen_declaration_instruction<'a>(node: Declaration<'a>, context: &mut Context<'a>) -> PrintItems {
     let mut items = PrintItems::new();
 
@@ -83,8 +74,6 @@ fn gen_declaration_instruction<'a>(node: Declaration<'a>, context: &mut Context<
 
 fn gen_rule_instruction<'a>(node: QualifiedRule<'a>, context: &mut Context<'a>) -> PrintItems {
     let mut items = PrintItems::new();
-
-    items.push_str("RULE");
     items.push_signal(Signal::NewLine);
     let sel = &node.selector.selectors;
     let complex_selectors: Vec<&ComplexSelectorChild> =
@@ -112,7 +101,6 @@ fn gen_rule_instruction<'a>(node: QualifiedRule<'a>, context: &mut Context<'a>) 
         .map(|n| n.name.as_literal().unwrap().raw)
         .collect();
 
-    // items.push_str(&names.join(", "));
     for (i, name) in names.iter().enumerate() {
         items.push_str(name);
         if i != names.len() - 1 {
@@ -120,8 +108,6 @@ fn gen_rule_instruction<'a>(node: QualifiedRule<'a>, context: &mut Context<'a>) 
             items.push_signal(Signal::NewLine);
         }
     }
-
-    // items.push_str(&node.block.statements.len().to_string());
 
     if node.block.statements.is_empty() {
         items.push_str(" {}");

@@ -1,8 +1,6 @@
 // use dprint_core::formatting::ir_helpers::gen_from_raw_string;
 use dprint_core::formatting::*;
-use raffia::ast::{
-    ComplexSelectorChild, Declaration, QualifiedRule, Statement, Stylesheet, WqName,
-};
+use raffia::ast::{ComplexSelectorChild, Declaration, QualifiedRule, Stylesheet, WqName};
 
 use super::context::Context;
 use super::helpers::*;
@@ -103,7 +101,7 @@ fn gen_rule_instruction<'a>(node: QualifiedRule<'a>, context: &mut Context<'a>) 
 
     for (i, name) in names.iter().enumerate() {
         items.push_str(name);
-        if i != names.len() - 1 {
+        if i < names.len() - 1 {
             items.push_str(",");
             items.push_signal(Signal::NewLine);
         }
@@ -125,8 +123,44 @@ fn gen_rule_instruction<'a>(node: QualifiedRule<'a>, context: &mut Context<'a>) 
                     items.push_str(ident);
                     items.push_str(": ");
 
+                    // parse value
                     for value in declaration.value.iter() {
-                        if value.is_hex_color() {
+                        if value.is_delimiter() {
+                            match value.as_delimiter().unwrap().kind {
+                                raffia::ast::DelimiterKind::Comma => items.push_str(", "),
+                                raffia::ast::DelimiterKind::Solidus => items.push_str("\\ "),
+                                raffia::ast::DelimiterKind::Semicolon => items.push_str("; "),
+                            };
+                        } else if value.is_interpolable_ident() {
+                            items.push_str(
+                                &value
+                                    .as_interpolable_ident()
+                                    .unwrap()
+                                    .as_literal()
+                                    .unwrap()
+                                    .name,
+                            );
+                        } else if value.is_interpolable_str() {
+                            items.push_str("\"");
+                            items.push_str(
+                                &value
+                                    .as_interpolable_str()
+                                    .unwrap()
+                                    .as_literal()
+                                    .unwrap()
+                                    .value,
+                            );
+                            items.push_str("\"");
+                        } else if value.is_dimension() {
+                            let dimension = value.as_dimension().unwrap();
+                            if dimension.is_length() {
+                                let len = dimension.as_length().unwrap();
+                                items.push_str(&len.value.value.to_string());
+                                items.push_str(&len.unit.name);
+                            }
+                        } else if value.is_number() {
+                            items.push_str(&value.as_number().unwrap().value.to_string());
+                        } else if value.is_hex_color() {
                             items.push_str("#");
                             items.push_str(&value.as_hex_color().unwrap().value);
                         }

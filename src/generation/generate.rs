@@ -1,11 +1,11 @@
 // use dprint_core::formatting::ir_helpers::gen_from_raw_string;
 use dprint_core::formatting::*;
-use parcel_css::rules::media::MediaRule;
+use lightningcss::rules::media::MediaRule;
 
 use super::context::Context;
 use super::helpers::*;
 use crate::configuration::Configuration;
-use parcel_css::stylesheet::StyleSheet;
+use lightningcss::stylesheet::StyleSheet;
 
 pub fn generate<'i>(file: StyleSheet<'i>, text: &'i str, config: &'i Configuration) -> PrintItems {
     let mut context = Context::new(text, file, config);

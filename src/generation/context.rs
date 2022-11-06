@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use parcel_css::stylesheet::StyleSheet;
+use lightningcss::stylesheet::StyleSheet;
 
 use super::helpers::*;
 use crate::configuration::Configuration;

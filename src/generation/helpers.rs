@@ -1,5 +1,5 @@
-use parcel_css::rules::media::MediaRule;
-use parcel_css::rules::CssRule;
+use lightningcss::rules::media::MediaRule;
+use lightningcss::rules::CssRule;
 
 #[derive(Clone)]
 pub enum Node<'a> {

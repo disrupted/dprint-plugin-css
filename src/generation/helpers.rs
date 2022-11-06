@@ -1,18 +1,19 @@
-use raffia::ast::Statement;
+use raffia::ast::{Declaration, QualifiedRule, Statement};
 
 #[derive(Clone)]
 pub enum Node<'a> {
-    Media(Statement<'a>),
+    Declaration(Declaration<'a>),
+    QualifiedRule(QualifiedRule<'a>),
 }
 
 impl<'a> From<Statement<'a>> for Node<'a> {
     fn from(rule: Statement<'a>) -> Node<'a> {
         match rule {
             Statement::AtRule(_) => todo!(),
-            Statement::Declaration(_) => todo!(),
+            Statement::Declaration(declaration) => Node::Declaration(declaration),
             Statement::KeyframeBlock(_) => todo!(),
             Statement::LessVariableDeclaration(_) => todo!(),
-            Statement::QualifiedRule(_) => todo!(),
+            Statement::QualifiedRule(rule) => Node::QualifiedRule(rule),
             Statement::SassContentAtRule(_) => todo!(),
             Statement::SassDebugAtRule(_) => todo!(),
             Statement::SassEachAtRule(_) => todo!(),

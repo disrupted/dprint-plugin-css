@@ -1,6 +1,6 @@
 // use dprint_core::formatting::ir_helpers::gen_from_raw_string;
 use dprint_core::formatting::*;
-use raffia::ast::{Statement, Stylesheet};
+use raffia::ast::{Declaration, QualifiedRule, Statement, Stylesheet};
 
 use super::context::Context;
 use super::helpers::*;
@@ -34,7 +34,9 @@ fn gen_node<'a>(node: Node<'a>, context: &mut Context<'a>) -> PrintItems {
 
     // context.set_current_node(node.clone());
     items.extend(match node {
-        Node::Media(node) => gen_media_instruction(node, context),
+        // _ => gen_debug(context),
+        Node::Declaration(node) => gen_declaration_instruction(node, context),
+        Node::QualifiedRule(node) => gen_rule_instruction(node, context),
         // Node::Arg(node) => gen_arg_instruction(node, context),
         // Node::Cmd(node) => gen_cmd_instruction(node, context),
         // Node::Copy(node) => gen_copy_instruction(node, context),
@@ -57,10 +59,52 @@ fn gen_node<'a>(node: Node<'a>, context: &mut Context<'a>) -> PrintItems {
     items
 }
 
-fn gen_media_instruction<'a>(node: Statement<'a>, context: &mut Context<'a>) -> PrintItems {
+fn gen_debug(context: &mut Context) -> PrintItems {
     let mut items = PrintItems::new();
 
-    items.push_str("ARG ");
+    items.push_str("DEBUG ");
+
+    items
+}
+
+fn gen_declaration_instruction<'a>(node: Declaration<'a>, context: &mut Context<'a>) -> PrintItems {
+    let mut items = PrintItems::new();
+
+    items.push_str("DECLARATION ");
+    // node.statements
+    //     .iter()
+    //     .map(|i| i.into())
+    //     .for_each(|rule| items.extend(gen_node(rule, context)));
+
+    items
+}
+
+fn gen_rule_instruction<'a>(node: QualifiedRule<'a>, context: &mut Context<'a>) -> PrintItems {
+    println!("{:#?}", node);
+    let mut items = PrintItems::new();
+
+    items.push_str("RULE ");
+    let name = &node
+        .selector
+        .selectors
+        .first()
+        .unwrap()
+        .children
+        .first()
+        .unwrap()
+        .as_compound_selector()
+        .unwrap()
+        .children
+        .first()
+        .unwrap()
+        .as_type()
+        .unwrap()
+        .as_tag_name()
+        .unwrap()
+        .name;
+    items.push_str(name.name.as_literal().unwrap().raw);
+    items.push_str(" ");
+    items.push_str(&node.block.statements.len().to_string());
     // node.statements
     //     .iter()
     //     .map(|i| i.into())

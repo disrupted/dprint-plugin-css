@@ -31,16 +31,16 @@ impl<'a> Context<'a> {
         nodes: impl Iterator<Item = Node<'a>>,
     ) -> Vec<Node<'a>> {
         let mut result = Vec::new();
-        // let mut last_pos = start_pos;
-        // for node in nodes {
-        //     let text = &self.text[last_pos..node.span().start];
-        //     for comment in parse_comments(text, last_pos) {
-        //         result.push(Node::CommentRc(Rc::new(comment)));
-        //     }
-        //     let node_end = node.span().end;
-        //     result.push(node);
-        //     last_pos = node_end;
-        // }
+        let mut last_pos = start_pos;
+        for node in nodes {
+            // let text = &self.text[last_pos..node.span().start];
+            // for comment in parse_comments(text, last_pos) {
+            //     result.push(Node::CommentRc(Rc::new(comment)));
+            // }
+            // let node_end = node.span().end;
+            result.push(node);
+            // last_pos = node_end;
+        }
         // let text = &self.text[last_pos..end_pos];
         // for comment in parse_comments(text, last_pos) {
         //     result.push(Node::CommentRc(Rc::new(comment)));

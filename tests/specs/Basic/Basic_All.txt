@@ -3,5 +3,5 @@ body{color:black}
 
 [expect]
 body {
-  color: #000;
+    color: black;
 }

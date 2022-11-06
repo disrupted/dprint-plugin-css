@@ -62,5 +62,5 @@ fn should_handle_windows_newlines() {
     let file_text =
         format_text(&PathBuf::from("file.css"), "body{color:black}\r\n", &config).unwrap();
 
-    assert_eq!(file_text, "body {\n  color: #000;\n}\n");
+    assert_eq!(file_text, "body {\n    color: black;\n}\n");
 }

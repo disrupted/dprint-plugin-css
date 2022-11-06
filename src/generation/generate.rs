@@ -74,7 +74,6 @@ fn gen_declaration_instruction<'a>(node: Declaration<'a>, context: &mut Context<
 
 fn gen_rule_instruction<'a>(node: QualifiedRule<'a>, context: &mut Context<'a>) -> PrintItems {
     let mut items = PrintItems::new();
-    items.push_signal(Signal::NewLine);
     let sel = &node.selector.selectors;
     let complex_selectors: Vec<&ComplexSelectorChild> =
         sel.iter().map(|s| s.children.first().unwrap()).collect();

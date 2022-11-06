@@ -89,7 +89,7 @@ mod tests {
         config
             .new_line_kind(NewLineKind::CarriageReturnLineFeed)
             .use_tabs(true)
-            .indent_width(4);
+            .indent_width(2);
 
         let inner_config = config.get_inner_config();
         assert_eq!(inner_config.len(), 3);

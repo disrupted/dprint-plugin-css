@@ -5,8 +5,8 @@ pub enum Node<'a> {
     Media(&'a Statement<'a>),
 }
 
-impl<'a> From<&'a Statement<'a>> for Node<'a> {
-    fn from(rule: &'a Statement<'a>) -> Node<'a> {
+impl<'a> From<Statement<'a>> for Node<'a> {
+    fn from(rule: Statement<'a>) -> Node<'a> {
         match rule {
             Statement::AtRule(_) => todo!(),
             Statement::Declaration(_) => todo!(),

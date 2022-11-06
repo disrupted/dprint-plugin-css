@@ -6,11 +6,14 @@ use super::context::Context;
 use super::helpers::*;
 use crate::configuration::Configuration;
 
-pub fn generate<'i>(file: Stylesheet<'i>, text: &'i str, config: &'i Configuration) -> PrintItems {
-    let mut context = Context::new(text, file, config);
+pub fn generate<'a>(file: Stylesheet<'a>, text: &'a str, config: &'a Configuration) -> PrintItems {
+    let mut context = Context::new(text, config);
     let mut items = PrintItems::new();
-    let top_level_nodes =
-        context.gen_nodes_with_comments(0, text.len(), file.statements.iter().map(|i| i.into()));
+    let top_level_nodes = context.gen_nodes_with_comments(
+        0,
+        text.len(),
+        file.statements.into_iter().map(|i| i.into()),
+    );
 
     for (i, node) in top_level_nodes.iter().enumerate() {
         items.extend(gen_node(node.clone(), &mut context));

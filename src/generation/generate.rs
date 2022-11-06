@@ -1,6 +1,8 @@
 // use dprint_core::formatting::ir_helpers::gen_from_raw_string;
 use dprint_core::formatting::*;
-use raffia::ast::{ComplexSelectorChild, Declaration, QualifiedRule, Stylesheet, WqName};
+use raffia::ast::{
+    ComplexSelectorChild, Declaration, QualifiedRule, SimpleSelector, Stylesheet, WqName,
+};
 
 use super::context::Context;
 use super::helpers::*;
@@ -76,28 +78,40 @@ fn gen_rule_instruction<'a>(node: QualifiedRule<'a>, context: &mut Context<'a>) 
     let sel = &node.selector.selectors;
     let complex_selectors: Vec<&ComplexSelectorChild> =
         sel.iter().map(|s| s.children.first().unwrap()).collect();
-    let wq_names: Vec<&WqName> = complex_selectors
+    let simple_selectors: Vec<&SimpleSelector> = complex_selectors
         .iter()
-        .map(|s| {
-            &s.as_compound_selector()
-                .unwrap()
-                .children
-                .first()
-                .unwrap()
-                // .as_class()
-                // .unwrap()
-                // .name
-                .as_type()
-                .unwrap()
-                .as_tag_name()
+        .map(|s| s.as_compound_selector().unwrap().children.first().unwrap())
+        .collect();
+
+    let mut names: Vec<String> = Vec::new();
+    for simple_selector in simple_selectors {
+        if simple_selector.is_type() {
+            names.push(
+                simple_selector
+                    .as_type()
+                    .unwrap()
+                    .as_tag_name()
+                    .unwrap()
+                    .name
+                    .name
+                    .as_literal()
+                    .unwrap()
+                    .name
+                    .to_string(),
+            );
+        } else if simple_selector.is_class() {
+            let name = &simple_selector
+                .as_class()
                 .unwrap()
                 .name
-        })
-        .collect();
-    let names: Vec<&str> = wq_names
-        .iter()
-        .map(|n| n.name.as_literal().unwrap().raw)
-        .collect();
+                .as_literal()
+                .unwrap()
+                .name;
+            let mut class = ".".to_owned();
+            class.push_str(name);
+            names.push(class);
+        }
+    }
 
     for (i, name) in names.iter().enumerate() {
         items.push_str(name);
@@ -160,6 +174,10 @@ fn gen_rule_instruction<'a>(node: QualifiedRule<'a>, context: &mut Context<'a>) 
                             }
                         } else if value.is_number() {
                             items.push_str(&value.as_number().unwrap().value.to_string());
+                        } else if value.is_percentage() {
+                            let percentage = value.as_percentage().unwrap();
+                            items.push_str(&percentage.value.value.to_string());
+                            items.push_str("%");
                         } else if value.is_hex_color() {
                             items.push_str("#");
                             items.push_str(&value.as_hex_color().unwrap().value);

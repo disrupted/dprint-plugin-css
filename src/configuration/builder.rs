@@ -15,6 +15,7 @@ use super::*;
 /// let config = ConfigurationBuilder::new()
 ///     .build();
 /// ```
+#[derive(Default)]
 pub struct ConfigurationBuilder {
     pub(super) config: ConfigKeyMap,
     global_config: Option<GlobalConfiguration>,
@@ -85,7 +86,7 @@ mod tests {
 
     #[test]
     fn check_all_values_set() {
-        let mut config = ConfigurationBuilder::new();
+        let mut config = ConfigurationBuilder::default();
         config
             .new_line_kind(NewLineKind::CarriageReturnLineFeed)
             .use_tabs(true)

@@ -1,21 +1,32 @@
 // use dprint_core::formatting::ir_helpers::gen_from_raw_string;
 use dprint_core::formatting::*;
-use raffia::ast::{
-    ComplexSelectorChild, Declaration, QualifiedRule, SimpleSelector, Stylesheet, WqName,
-};
+use raffia::ast::{ComplexSelectorChild, Declaration, QualifiedRule, SimpleSelector};
 
 use super::context::Context;
 use super::helpers::*;
 use crate::configuration::Configuration;
+use crate::format_text::Ast;
 
-pub fn generate<'a>(file: Stylesheet<'a>, text: &'a str, config: &'a Configuration) -> PrintItems {
+pub fn generate<'a>(ast: Ast<'a>, text: &'a str, config: &'a Configuration) -> PrintItems {
     let mut context = Context::new(text, config);
     let mut items = PrintItems::new();
     let top_level_nodes = context.gen_nodes_with_comments(
         0,
         text.len(),
-        file.statements.into_iter().map(|i| i.into()),
+        ast.stylesheet.statements.into_iter().map(|i| i.into()),
     );
+
+    for comment in ast.comments {
+        if comment.is_line() {
+            items.push_str("// ");
+            items.push_str(comment.as_line().unwrap().content);
+        } else if comment.is_block() {
+            items.push_str("/* ");
+            items.push_str(comment.as_block().unwrap().content);
+            items.push_str(" */");
+        }
+        items.push_signal(Signal::NewLine);
+    }
 
     for (i, node) in top_level_nodes.iter().enumerate() {
         items.extend(gen_node(node.clone(), &mut context));

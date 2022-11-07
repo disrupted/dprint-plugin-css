@@ -1,26 +1,40 @@
 use anyhow::{anyhow, Result};
 use dprint_core::configuration::resolve_new_line_kind;
 use dprint_core::formatting::PrintOptions;
-use raffia::{ast::Stylesheet, Parser, Syntax};
+use raffia::ast::Stylesheet;
+use raffia::token::Comment;
+use raffia::ParserBuilder;
 use std::path::Path;
 
 use crate::configuration::Configuration;
 use crate::generation::generate;
 
+pub struct Ast<'a> {
+    pub stylesheet: Stylesheet<'a>,
+    pub comments: Vec<Comment<'a>>,
+}
+
 pub fn format_text(_file_path: &Path, text: &str, config: &Configuration) -> Result<String> {
-    let node = parse_node(text)?;
+    let ast = parse_ast(text)?;
 
     Ok(dprint_core::formatting::format(
-        || generate(node, text, config),
+        || generate(ast, text, config),
         config_to_print_options(text, config),
     ))
 }
 
-fn parse_node(text: &str) -> Result<Stylesheet> {
-    let mut parser = Parser::new(text, Syntax::Css);
-    parser
+fn parse_ast(text: &str) -> Result<Ast> {
+    let mut comments = vec![];
+    let mut parser = ParserBuilder::new(text).comments(&mut comments).build();
+    let stylesheet = parser
         .parse::<Stylesheet>()
-        .map_err(|err| anyhow!("raffia error")) // TODO
+        .map_err(|err| anyhow!("raffia error"))
+        .unwrap(); // TODO
+    eprintln!("{:#?}", comments);
+    Ok(Ast {
+        stylesheet,
+        comments,
+    })
 }
 
 fn config_to_print_options(text: &str, config: &Configuration) -> PrintOptions {

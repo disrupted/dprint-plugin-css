@@ -82,6 +82,36 @@ fn gen_rule_instruction(node: QualifiedRule) -> PrintItems {
         .map(|s| s.as_compound_selector().unwrap().children.first().unwrap())
         .collect();
 
+    items.extend(gen_selector_instruction(simple_selectors));
+
+    if node.block.statements.is_empty() {
+        items.push_str(" {}");
+    } else {
+        items.push_str(" {");
+        items.push_signal(Signal::NewLine);
+
+        // parse statements inside block
+        for statement in node.block.statements {
+            items.extend(ir_helpers::with_indent({
+                let mut items = PrintItems::new();
+                if statement.is_declaration() {
+                    items.extend(gen_declaration_instruction(
+                        statement.as_declaration().unwrap(),
+                    ));
+                }
+                items.push_str(";");
+                items.push_signal(Signal::NewLine);
+                items
+            }));
+        }
+        items.push_str("}");
+    }
+
+    items
+}
+
+fn gen_selector_instruction(simple_selectors: Vec<&SimpleSelector>) -> PrintItems {
+    let mut items = PrintItems::new();
     let mut names: Vec<String> = Vec::new();
     for simple_selector in simple_selectors {
         if simple_selector.is_type() {
@@ -130,30 +160,6 @@ fn gen_rule_instruction(node: QualifiedRule) -> PrintItems {
             items.push_signal(Signal::NewLine);
         }
     }
-
-    if node.block.statements.is_empty() {
-        items.push_str(" {}");
-    } else {
-        items.push_str(" {");
-        items.push_signal(Signal::NewLine);
-
-        // parse statements inside block
-        for statement in node.block.statements {
-            items.extend(ir_helpers::with_indent({
-                let mut items = PrintItems::new();
-                if statement.is_declaration() {
-                    items.extend(gen_declaration_instruction(
-                        statement.as_declaration().unwrap(),
-                    ));
-                }
-                items.push_str(";");
-                items.push_signal(Signal::NewLine);
-                items
-            }));
-        }
-        items.push_str("}");
-    }
-
     items
 }
 

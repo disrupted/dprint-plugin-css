@@ -1,7 +1,8 @@
 // use dprint_core::formatting::ir_helpers::gen_from_raw_string;
 use dprint_core::formatting::*;
 use raffia::ast::{
-    ComplexSelectorChild, ComponentValue, Declaration, Function, QualifiedRule, SimpleSelector,
+    ComplexSelectorChild, ComponentValue, Declaration, Delimiter, DelimiterKind, Function,
+    QualifiedRule, SimpleSelector,
 };
 
 use super::context::Context;
@@ -88,11 +89,7 @@ fn gen_declaration_instruction<'a>(node: Declaration<'a>, context: &mut Context<
 fn parse_component_value(value: &ComponentValue) -> PrintItems {
     let mut items = PrintItems::new();
     if value.is_delimiter() {
-        match value.as_delimiter().unwrap().kind {
-            raffia::ast::DelimiterKind::Comma => items.push_str(", "),
-            raffia::ast::DelimiterKind::Solidus => items.push_str("\\ "),
-            raffia::ast::DelimiterKind::Semicolon => items.push_str("; "),
-        };
+        items.extend(parse_delimiter(value.as_delimiter().unwrap()));
     } else if value.is_interpolable_ident() {
         items.push_str(
             &value
@@ -132,6 +129,16 @@ fn parse_component_value(value: &ComponentValue) -> PrintItems {
     } else if value.is_function() {
         items.extend(parse_function(value.as_function().unwrap()));
     }
+    items
+}
+
+fn parse_delimiter(delimiter: &Delimiter) -> PrintItems {
+    let mut items = PrintItems::new();
+    match delimiter.kind {
+        raffia::ast::DelimiterKind::Comma => items.push_str(", "),
+        raffia::ast::DelimiterKind::Solidus => items.push_str("\\ "),
+        raffia::ast::DelimiterKind::Semicolon => items.push_str("; "),
+    };
     items
 }
 

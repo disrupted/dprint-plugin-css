@@ -2,7 +2,7 @@
 use dprint_core::formatting::*;
 use raffia::ast::{
     ComplexSelectorChild, ComponentValue, Declaration, Delimiter, DelimiterKind, Function,
-    QualifiedRule, SimpleSelector,
+    InterpolableIdent, QualifiedRule, SimpleSelector,
 };
 
 use super::context::Context;
@@ -91,14 +91,9 @@ fn parse_component_value(value: &ComponentValue) -> PrintItems {
     if value.is_delimiter() {
         items.extend(parse_delimiter(value.as_delimiter().unwrap()));
     } else if value.is_interpolable_ident() {
-        items.push_str(
-            &value
-                .as_interpolable_ident()
-                .unwrap()
-                .as_literal()
-                .unwrap()
-                .name,
-        );
+        items.extend(parse_interpolable_ident(
+            value.as_interpolable_ident().unwrap(),
+        ));
     } else if value.is_interpolable_str() {
         items.push_str("\"");
         items.push_str(
@@ -139,6 +134,12 @@ fn parse_delimiter(delimiter: &Delimiter) -> PrintItems {
         raffia::ast::DelimiterKind::Solidus => items.push_str("\\ "),
         raffia::ast::DelimiterKind::Semicolon => items.push_str("; "),
     };
+    items
+}
+
+fn parse_interpolable_ident(ident: &InterpolableIdent) -> PrintItems {
+    let mut items = PrintItems::new();
+    items.push_str(&ident.as_literal().unwrap().name);
     items
 }
 

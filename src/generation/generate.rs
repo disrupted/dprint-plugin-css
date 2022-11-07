@@ -1,8 +1,8 @@
 // use dprint_core::formatting::ir_helpers::gen_from_raw_string;
 use dprint_core::formatting::*;
 use raffia::ast::{
-    ComplexSelectorChild, ComponentValue, Declaration, Delimiter, DelimiterKind, Dimension,
-    Function, InterpolableIdent, InterpolableStr, QualifiedRule, SimpleSelector,
+    ComplexSelectorChild, ComponentValue, Declaration, Delimiter, Dimension, Function,
+    InterpolableIdent, InterpolableStr, QualifiedRule, SimpleSelector,
 };
 
 use super::context::Context;
@@ -48,10 +48,9 @@ pub fn generate<'a>(ast: Ast<'a>, text: &'a str, config: &'a Configuration) -> P
 fn gen_node<'a>(node: Node<'a>, context: &mut Context<'a>) -> PrintItems {
     let mut items = PrintItems::new();
 
-    // context.set_current_node(node.clone());
     items.extend(match node {
-        Node::Declaration(node) => gen_declaration_instruction(node, context),
-        Node::QualifiedRule(node) => gen_rule_instruction(node, context),
+        Node::Declaration(node) => gen_declaration_instruction(&node),
+        Node::QualifiedRule(node) => gen_rule_instruction(node),
         // Node::Arg(node) => gen_arg_instruction(node, context),
         // Node::Cmd(node) => gen_cmd_instruction(node, context),
         // Node::Copy(node) => gen_copy_instruction(node, context),
@@ -70,19 +69,23 @@ fn gen_node<'a>(node: Node<'a>, context: &mut Context<'a>) -> PrintItems {
         // Node::CommentRc(node) => gen_comment(&node, context),
         // Node::Comment(node) => gen_comment(node, context),
     });
-    // context.pop_current_node();
     items
 }
 
-fn gen_declaration_instruction<'a>(node: Declaration<'a>, context: &mut Context<'a>) -> PrintItems {
+fn gen_declaration_instruction(node: &Declaration) -> PrintItems {
     let mut items = PrintItems::new();
+    let ident = node.name.as_literal().unwrap().raw;
+    items.push_str(ident);
+    items.push_str(": ");
 
-    items.push_str("DECLARATION ");
-    // node.statements
-    //     .iter()
-    //     .map(|i| i.into())
-    //     .for_each(|rule| items.extend(gen_node(rule, context)));
+    // parse value
+    node.value
+        .iter()
+        .for_each(|value| items.extend(parse_component_value(value)));
 
+    if node.important.is_some() {
+        items.push_str(" !important");
+    }
     items
 }
 
@@ -101,8 +104,7 @@ fn parse_component_value(value: &ComponentValue) -> PrintItems {
     } else if value.is_number() {
         items.push_str(&value.as_number().unwrap().value.to_string());
     } else if value.is_percentage() {
-        let percentage = value.as_percentage().unwrap();
-        items.push_str(&percentage.value.value.to_string());
+        items.push_str(&value.as_percentage().unwrap().value.value.to_string());
         items.push_str("%");
     } else if value.is_hex_color() {
         items.push_str("#");
@@ -164,7 +166,7 @@ fn parse_function(function: &Function) -> PrintItems {
     items
 }
 
-fn gen_rule_instruction<'a>(node: QualifiedRule<'a>, context: &mut Context<'a>) -> PrintItems {
+fn gen_rule_instruction(node: QualifiedRule) -> PrintItems {
     let mut items = PrintItems::new();
     let sel = &node.selector.selectors;
     let complex_selectors: Vec<&ComplexSelectorChild> =
@@ -230,24 +232,13 @@ fn gen_rule_instruction<'a>(node: QualifiedRule<'a>, context: &mut Context<'a>) 
         items.push_signal(Signal::NewLine);
 
         // parse statements inside block
-        for statement in &node.block.statements {
+        for statement in node.block.statements {
             items.extend(ir_helpers::with_indent({
                 let mut items = PrintItems::new();
                 if statement.is_declaration() {
-                    let declaration = statement.as_declaration().unwrap();
-                    let ident = declaration.name.as_literal().unwrap().raw;
-                    items.push_str(ident);
-                    items.push_str(": ");
-
-                    // parse value
-                    declaration
-                        .value
-                        .iter()
-                        .for_each(|value| items.extend(parse_component_value(value)));
-
-                    if declaration.important.is_some() {
-                        items.push_str(" !important");
-                    }
+                    items.extend(gen_declaration_instruction(
+                        statement.as_declaration().unwrap(),
+                    ));
                 }
                 items.push_str(";");
                 items.push_signal(Signal::NewLine);

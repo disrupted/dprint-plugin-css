@@ -4,6 +4,7 @@ use raffia::ast::{
     ComplexSelectorChild, ComponentValue, Declaration, Delimiter, Dimension, Function,
     InterpolableIdent, InterpolableStr, QualifiedRule, SimpleSelector,
 };
+use raffia::token::TokenWithSpan;
 
 use super::context::Context;
 use super::helpers::*;
@@ -204,10 +205,7 @@ fn parse_component_value(value: &ComponentValue) -> PrintItems {
     } else if value.is_function() {
         items.extend(parse_function(value.as_function().unwrap()));
     } else if value.is_token_with_span() {
-        let token = &value.as_token_with_span().unwrap().token;
-        if token.is_str() {
-            items.push_str(token.as_str().unwrap().raw);
-        }
+        items.extend(parse_token_with_span(value.as_token_with_span().unwrap()));
     }
     items
 }
@@ -260,5 +258,14 @@ fn parse_function(function: &Function) -> PrintItems {
             items.extend(p);
         });
     items.push_str(")");
+    items
+}
+
+fn parse_token_with_span(node: &TokenWithSpan) -> PrintItems {
+    let mut items = PrintItems::new();
+    let token = &node.token;
+    if token.is_str() {
+        items.push_str(token.as_str().unwrap().raw);
+    }
     items
 }

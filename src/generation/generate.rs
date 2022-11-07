@@ -49,8 +49,8 @@ fn gen_node<'a>(node: Node<'a>, context: &mut Context<'a>) -> PrintItems {
     let mut items = PrintItems::new();
 
     items.extend(match node {
-        Node::Declaration(node) => gen_declaration_instruction(&node),
         Node::QualifiedRule(node) => gen_rule_instruction(node),
+        Node::Declaration(node) => gen_declaration_instruction(&node),
         // Node::Arg(node) => gen_arg_instruction(node, context),
         // Node::Cmd(node) => gen_cmd_instruction(node, context),
         // Node::Copy(node) => gen_copy_instruction(node, context),
@@ -69,6 +69,91 @@ fn gen_node<'a>(node: Node<'a>, context: &mut Context<'a>) -> PrintItems {
         // Node::CommentRc(node) => gen_comment(&node, context),
         // Node::Comment(node) => gen_comment(node, context),
     });
+    items
+}
+
+fn gen_rule_instruction(node: QualifiedRule) -> PrintItems {
+    let mut items = PrintItems::new();
+    let sel = &node.selector.selectors;
+    let complex_selectors: Vec<&ComplexSelectorChild> =
+        sel.iter().map(|s| s.children.first().unwrap()).collect();
+    let simple_selectors: Vec<&SimpleSelector> = complex_selectors
+        .iter()
+        .map(|s| s.as_compound_selector().unwrap().children.first().unwrap())
+        .collect();
+
+    let mut names: Vec<String> = Vec::new();
+    for simple_selector in simple_selectors {
+        if simple_selector.is_type() {
+            names.push(
+                simple_selector
+                    .as_type()
+                    .unwrap()
+                    .as_tag_name()
+                    .unwrap()
+                    .name
+                    .name
+                    .as_literal()
+                    .unwrap()
+                    .name
+                    .to_string(),
+            );
+        } else if simple_selector.is_class() {
+            let name = &simple_selector
+                .as_class()
+                .unwrap()
+                .name
+                .as_literal()
+                .unwrap()
+                .name;
+            let mut class = ".".to_owned();
+            class.push_str(name);
+            names.push(class);
+        } else if simple_selector.is_id() {
+            let name = &simple_selector
+                .as_id()
+                .unwrap()
+                .name
+                .as_literal()
+                .unwrap()
+                .name;
+            let mut id = "#".to_owned();
+            id.push_str(name);
+            names.push(id);
+        }
+    }
+
+    for (i, name) in names.iter().enumerate() {
+        items.push_str(name);
+        if i < names.len() - 1 {
+            items.push_str(",");
+            items.push_signal(Signal::NewLine);
+        }
+    }
+
+    if node.block.statements.is_empty() {
+        items.push_str(" {}");
+    } else {
+        items.push_str(" {");
+        items.push_signal(Signal::NewLine);
+
+        // parse statements inside block
+        for statement in node.block.statements {
+            items.extend(ir_helpers::with_indent({
+                let mut items = PrintItems::new();
+                if statement.is_declaration() {
+                    items.extend(gen_declaration_instruction(
+                        statement.as_declaration().unwrap(),
+                    ));
+                }
+                items.push_str(";");
+                items.push_signal(Signal::NewLine);
+                items
+            }));
+        }
+        items.push_str("}");
+    }
+
     items
 }
 
@@ -163,90 +248,5 @@ fn parse_function(function: &Function) -> PrintItems {
             items.extend(p);
         });
     items.push_str(")");
-    items
-}
-
-fn gen_rule_instruction(node: QualifiedRule) -> PrintItems {
-    let mut items = PrintItems::new();
-    let sel = &node.selector.selectors;
-    let complex_selectors: Vec<&ComplexSelectorChild> =
-        sel.iter().map(|s| s.children.first().unwrap()).collect();
-    let simple_selectors: Vec<&SimpleSelector> = complex_selectors
-        .iter()
-        .map(|s| s.as_compound_selector().unwrap().children.first().unwrap())
-        .collect();
-
-    let mut names: Vec<String> = Vec::new();
-    for simple_selector in simple_selectors {
-        if simple_selector.is_type() {
-            names.push(
-                simple_selector
-                    .as_type()
-                    .unwrap()
-                    .as_tag_name()
-                    .unwrap()
-                    .name
-                    .name
-                    .as_literal()
-                    .unwrap()
-                    .name
-                    .to_string(),
-            );
-        } else if simple_selector.is_class() {
-            let name = &simple_selector
-                .as_class()
-                .unwrap()
-                .name
-                .as_literal()
-                .unwrap()
-                .name;
-            let mut class = ".".to_owned();
-            class.push_str(name);
-            names.push(class);
-        } else if simple_selector.is_id() {
-            let name = &simple_selector
-                .as_id()
-                .unwrap()
-                .name
-                .as_literal()
-                .unwrap()
-                .name;
-            let mut id = "#".to_owned();
-            id.push_str(name);
-            names.push(id);
-        }
-    }
-
-    for (i, name) in names.iter().enumerate() {
-        items.push_str(name);
-        if i < names.len() - 1 {
-            items.push_str(",");
-            items.push_signal(Signal::NewLine);
-        }
-    }
-
-    if node.block.statements.is_empty() {
-        items.push_str(" {}");
-    } else {
-        items.push_str(" {");
-        items.push_signal(Signal::NewLine);
-
-        // parse statements inside block
-        for statement in node.block.statements {
-            items.extend(ir_helpers::with_indent({
-                let mut items = PrintItems::new();
-                if statement.is_declaration() {
-                    items.extend(gen_declaration_instruction(
-                        statement.as_declaration().unwrap(),
-                    ));
-                }
-                items.push_str(";");
-                items.push_signal(Signal::NewLine);
-                items
-            }));
-        }
-        items.push_str("}");
-    }
-
     items
 }

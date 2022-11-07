@@ -98,10 +98,9 @@ fn gen_selector_instruction(simple_selectors: Vec<&SimpleSelector>) -> PrintItem
     let mut names: Vec<String> = Vec::new();
     for simple_selector in simple_selectors {
         if simple_selector.is_type() {
-            names.push(
-                simple_selector
-                    .as_type()
-                    .unwrap()
+            let typ = simple_selector.as_type().unwrap();
+            if typ.is_tag_name() {
+                let name = typ
                     .as_tag_name()
                     .unwrap()
                     .name
@@ -109,8 +108,11 @@ fn gen_selector_instruction(simple_selectors: Vec<&SimpleSelector>) -> PrintItem
                     .as_literal()
                     .unwrap()
                     .name
-                    .to_string(),
-            );
+                    .to_string();
+                names.push(name);
+            } else if typ.is_universal() {
+                names.push("*".to_owned());
+            }
         } else if simple_selector.is_class() {
             let name = &simple_selector
                 .as_class()
@@ -143,6 +145,7 @@ fn gen_selector_instruction(simple_selectors: Vec<&SimpleSelector>) -> PrintItem
             items.push_signal(Signal::NewLine);
         }
     }
+
     items
 }
 

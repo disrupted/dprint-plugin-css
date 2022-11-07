@@ -116,6 +116,7 @@ fn gen_rule_instruction<'a>(node: QualifiedRule<'a>, context: &mut Context<'a>) 
         items.push_str(name);
         if i < names.len() - 1 {
             items.push_str(",");
+            items.push_signal(Signal::NewLine);
         }
     }
 

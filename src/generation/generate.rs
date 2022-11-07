@@ -2,7 +2,7 @@
 use dprint_core::formatting::*;
 use raffia::ast::{
     ComplexSelectorChild, ComponentValue, Declaration, Delimiter, DelimiterKind, Function,
-    InterpolableIdent, QualifiedRule, SimpleSelector,
+    InterpolableIdent, InterpolableStr, QualifiedRule, SimpleSelector,
 };
 
 use super::context::Context;
@@ -95,16 +95,7 @@ fn parse_component_value(value: &ComponentValue) -> PrintItems {
             value.as_interpolable_ident().unwrap(),
         ));
     } else if value.is_interpolable_str() {
-        items.push_str("\"");
-        items.push_str(
-            &value
-                .as_interpolable_str()
-                .unwrap()
-                .as_literal()
-                .unwrap()
-                .value,
-        );
-        items.push_str("\"");
+        items.extend(parse_interpolable_str(value.as_interpolable_str().unwrap()));
     } else if value.is_dimension() {
         let dimension = value.as_dimension().unwrap();
         if dimension.is_length() {
@@ -140,6 +131,14 @@ fn parse_delimiter(delimiter: &Delimiter) -> PrintItems {
 fn parse_interpolable_ident(ident: &InterpolableIdent) -> PrintItems {
     let mut items = PrintItems::new();
     items.push_str(&ident.as_literal().unwrap().name);
+    items
+}
+
+fn parse_interpolable_str(str: &InterpolableStr) -> PrintItems {
+    let mut items = PrintItems::new();
+    items.push_str("\"");
+    items.push_str(&str.as_literal().unwrap().value);
+    items.push_str("\"");
     items
 }
 

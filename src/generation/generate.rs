@@ -1,8 +1,8 @@
 // use dprint_core::formatting::ir_helpers::gen_from_raw_string;
 use dprint_core::formatting::*;
 use raffia::ast::{
-    ComplexSelectorChild, ComponentValue, Declaration, Delimiter, DelimiterKind, Function,
-    InterpolableIdent, InterpolableStr, QualifiedRule, SimpleSelector,
+    ComplexSelectorChild, ComponentValue, Declaration, Delimiter, DelimiterKind, Dimension,
+    Function, InterpolableIdent, InterpolableStr, QualifiedRule, SimpleSelector,
 };
 
 use super::context::Context;
@@ -97,12 +97,7 @@ fn parse_component_value(value: &ComponentValue) -> PrintItems {
     } else if value.is_interpolable_str() {
         items.extend(parse_interpolable_str(value.as_interpolable_str().unwrap()));
     } else if value.is_dimension() {
-        let dimension = value.as_dimension().unwrap();
-        if dimension.is_length() {
-            let len = dimension.as_length().unwrap();
-            items.push_str(&len.value.value.to_string());
-            items.push_str(&len.unit.name);
-        }
+        items.extend(parse_dimension(value.as_dimension().unwrap()));
     } else if value.is_number() {
         items.push_str(&value.as_number().unwrap().value.to_string());
     } else if value.is_percentage() {
@@ -139,6 +134,16 @@ fn parse_interpolable_str(str: &InterpolableStr) -> PrintItems {
     items.push_str("\"");
     items.push_str(&str.as_literal().unwrap().value);
     items.push_str("\"");
+    items
+}
+
+fn parse_dimension(dimension: &Dimension) -> PrintItems {
+    let mut items = PrintItems::new();
+    if dimension.is_length() {
+        let len = dimension.as_length().unwrap();
+        items.push_str(&len.value.value.to_string());
+        items.push_str(&len.unit.name);
+    }
     items
 }
 

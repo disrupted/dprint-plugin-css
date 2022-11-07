@@ -51,7 +51,7 @@ body {
 }
 
 *  {  }
-::before,::after{}
+::before,::after{--tw-content: '';}
 
 selector:pseudo-class {
 }
@@ -86,6 +86,8 @@ body {
 * {}
 
 ::before,
-::after {}
+::after {
+    --tw-content: '';
+}
 
 selector:pseudo-class {}

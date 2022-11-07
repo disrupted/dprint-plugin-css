@@ -203,6 +203,11 @@ fn parse_component_value(value: &ComponentValue) -> PrintItems {
         items.push_str(&value.as_hex_color().unwrap().value);
     } else if value.is_function() {
         items.extend(parse_function(value.as_function().unwrap()));
+    } else if value.is_token_with_span() {
+        let token = &value.as_token_with_span().unwrap().token;
+        if token.is_str() {
+            items.push_str(token.as_str().unwrap().raw);
+        }
     }
     items
 }

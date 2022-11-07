@@ -60,12 +60,17 @@ fn gen_rule_instruction(node: QualifiedRule) -> PrintItems {
     let sel = &node.selector.selectors;
     let complex_selectors: Vec<&ComplexSelectorChild> =
         sel.iter().map(|s| s.children.first().unwrap()).collect();
-    let simple_selectors: Vec<&SimpleSelector> = complex_selectors
-        .iter()
-        .map(|s| s.as_compound_selector().unwrap().children.first().unwrap())
-        .collect();
 
-    items.extend(gen_selector_instruction(simple_selectors));
+    for (i, complex_selector) in complex_selectors.iter().enumerate() {
+        let simple_selectors = &complex_selector.as_compound_selector().unwrap().children;
+        for (_, simple_selector) in simple_selectors.iter().enumerate() {
+            items.extend(gen_selector_instruction(simple_selector));
+        }
+        if i < complex_selectors.len() - 1 {
+            items.push_str(",");
+            items.push_signal(Signal::NewLine);
+        }
+    }
 
     if node.block.statements.is_empty() {
         items.push_str(" {}");
@@ -93,81 +98,69 @@ fn gen_rule_instruction(node: QualifiedRule) -> PrintItems {
     items
 }
 
-fn gen_selector_instruction(simple_selectors: Vec<&SimpleSelector>) -> PrintItems {
+fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
     let mut items = PrintItems::new();
-    let mut names: Vec<String> = Vec::new();
-    for simple_selector in simple_selectors {
-        if simple_selector.is_type() {
-            let typ = simple_selector.as_type().unwrap();
-            if typ.is_tag_name() {
-                let name = typ
-                    .as_tag_name()
-                    .unwrap()
-                    .name
-                    .name
-                    .as_literal()
-                    .unwrap()
-                    .name
-                    .to_string();
-                names.push(name);
-            } else if typ.is_universal() {
-                names.push("*".to_owned());
-            }
-        } else if simple_selector.is_class() {
-            let name = &simple_selector
-                .as_class()
+    if simple_selector.is_type() {
+        let typ = simple_selector.as_type().unwrap();
+        if typ.is_tag_name() {
+            let name = typ
+                .as_tag_name()
                 .unwrap()
+                .name
                 .name
                 .as_literal()
                 .unwrap()
-                .name;
-            let mut class = ".".to_owned();
-            class.push_str(name);
-            names.push(class);
-        } else if simple_selector.is_id() {
-            let name = &simple_selector
-                .as_id()
-                .unwrap()
                 .name
-                .as_literal()
-                .unwrap()
-                .name;
-            let mut id = "#".to_owned();
-            id.push_str(name);
-            names.push(id);
-        } else if simple_selector.is_pseudo_element() {
-            let name = &simple_selector
-                .as_pseudo_element()
-                .unwrap()
-                .name
-                .as_literal()
-                .unwrap()
-                .name;
-            let mut pseudo = "::".to_owned();
-            pseudo.push_str(name);
-            names.push(pseudo);
-        } else if simple_selector.is_pseudo_class() {
-            let name = &simple_selector
-                .as_pseudo_class()
-                .unwrap()
-                .name
-                .as_literal()
-                .unwrap()
-                .name;
-            let mut pseudo = ":".to_owned();
-            pseudo.push_str(name);
-            names.push(pseudo);
+                .to_string();
+            items.push_str(&name);
+        } else if typ.is_universal() {
+            items.push_str("*");
         }
+    } else if simple_selector.is_class() {
+        let name = &simple_selector
+            .as_class()
+            .unwrap()
+            .name
+            .as_literal()
+            .unwrap()
+            .name;
+        let mut class = ".".to_owned();
+        class.push_str(name);
+        items.push_str(&class);
+    } else if simple_selector.is_id() {
+        let name = &simple_selector
+            .as_id()
+            .unwrap()
+            .name
+            .as_literal()
+            .unwrap()
+            .name;
+        let mut id = "#".to_owned();
+        id.push_str(name);
+        items.push_str(&id);
+    } else if simple_selector.is_pseudo_element() {
+        let name = &simple_selector
+            .as_pseudo_element()
+            .unwrap()
+            .name
+            .as_literal()
+            .unwrap()
+            .name;
+        let mut pseudo = "::".to_owned();
+        pseudo.push_str(name);
+        items.push_str(&pseudo);
+    } else if simple_selector.is_pseudo_class() {
+        let name = &simple_selector
+            .as_pseudo_class()
+            .unwrap()
+            .name
+            .as_literal()
+            .unwrap()
+            .name;
+        let mut pseudo = ":".to_owned();
+        pseudo.push_str(name);
+        items.push_str(&pseudo);
     }
-
-    for (i, name) in names.iter().enumerate() {
-        items.push_str(name);
-        if i < names.len() - 1 {
-            items.push_str(",");
-            items.push_signal(Signal::NewLine);
-        }
-    }
-
     items
 }
 

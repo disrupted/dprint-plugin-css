@@ -53,6 +53,9 @@ body {
 *  {  }
 ::before,::after{}
 
+selector:pseudo-class {
+}
+
 [expect]
 body {
     margin: 0;
@@ -84,3 +87,5 @@ body {
 
 ::before,
 ::after {}
+
+selector:pseudo-class {}

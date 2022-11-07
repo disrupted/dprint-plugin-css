@@ -28,9 +28,7 @@ fn parse_ast(text: &str) -> Result<Ast> {
     let mut parser = ParserBuilder::new(text).comments(&mut comments).build();
     let stylesheet = parser
         .parse::<Stylesheet>()
-        .map_err(|err| anyhow!("raffia error"))
-        .unwrap(); // TODO
-    eprintln!("{:#?}", comments);
+        .map_err(|err| anyhow!("parser error {:#?}", err))?;
     Ok(Ast {
         stylesheet,
         comments,

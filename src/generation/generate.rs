@@ -1,7 +1,7 @@
 // use dprint_core::formatting::ir_helpers::gen_from_raw_string;
 use dprint_core::formatting::*;
 use raffia::ast::{
-    ComplexSelectorChild, ComponentValue, Declaration, QualifiedRule, SimpleSelector,
+    ComplexSelectorChild, ComponentValue, Declaration, Function, QualifiedRule, SimpleSelector,
 };
 
 use super::context::Context;
@@ -130,21 +130,25 @@ fn parse_component_value(value: &ComponentValue) -> PrintItems {
         items.push_str("#");
         items.push_str(&value.as_hex_color().unwrap().value);
     } else if value.is_function() {
-        let name = &value.as_function().unwrap().name.as_literal().unwrap().name;
-
-        items.push_str(name);
-        items.push_str("(");
-        value
-            .as_function()
-            .unwrap()
-            .args
-            .iter()
-            .map(parse_component_value)
-            .for_each(|p| {
-                items.extend(p);
-            });
-        items.push_str(")");
+        items.extend(parse_function(value.as_function().unwrap()));
     }
+    items
+}
+
+fn parse_function(function: &Function) -> PrintItems {
+    let mut items = PrintItems::new();
+    let name = &function.name.as_literal().unwrap().name;
+
+    items.push_str(name);
+    items.push_str("(");
+    function
+        .args
+        .iter()
+        .map(parse_component_value)
+        .for_each(|p| {
+            items.extend(p);
+        });
+    items.push_str(")");
     items
 }
 

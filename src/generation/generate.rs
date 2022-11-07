@@ -51,23 +51,6 @@ fn gen_node<'a>(node: Node<'a>, context: &mut Context<'a>) -> PrintItems {
     items.extend(match node {
         Node::QualifiedRule(node) => gen_rule_instruction(node),
         Node::Declaration(node) => gen_declaration_instruction(&node),
-        // Node::Arg(node) => gen_arg_instruction(node, context),
-        // Node::Cmd(node) => gen_cmd_instruction(node, context),
-        // Node::Copy(node) => gen_copy_instruction(node, context),
-        // Node::Entrypoint(node) => gen_entrypoint_instruction(node, context),
-        // Node::Env(node) => gen_env_instruction(node, context),
-        // Node::EnvVar(node) => gen_env_var(node, context),
-        // Node::From(node) => gen_from_instruction(node, context),
-        // Node::Label(node) => gen_label_instruction(node, context),
-        // Node::LabelLabel(node) => gen_label(node, context),
-        // Node::Misc(node) => gen_misc_instruction(node, context),
-        // Node::Run(node) => gen_run_instruction(node, context),
-        // Node::StringArray(node) => gen_string_array(node, context),
-        // Node::String(node) => gen_string(node, context),
-        // Node::BreakableString(node) => gen_breakable_string(node, context),
-        // Node::CopyFlag(node) => gen_copy_flag(node, context),
-        // Node::CommentRc(node) => gen_comment(&node, context),
-        // Node::Comment(node) => gen_comment(node, context),
     });
     items
 }

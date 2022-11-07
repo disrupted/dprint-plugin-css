@@ -228,9 +228,10 @@ fn gen_rule_instruction<'a>(node: QualifiedRule<'a>, context: &mut Context<'a>) 
                     items.push_str(": ");
 
                     // parse value
-                    for value in declaration.value.iter() {
-                        items.extend(parse_component_value(value));
-                    }
+                    declaration
+                        .value
+                        .iter()
+                        .for_each(|value| items.extend(parse_component_value(value)));
 
                     if declaration.important.is_some() {
                         items.push_str(" !important");
@@ -243,11 +244,6 @@ fn gen_rule_instruction<'a>(node: QualifiedRule<'a>, context: &mut Context<'a>) 
         }
         items.push_str("}");
     }
-
-    // node.statements
-    //     .iter()
-    //     .map(|i| i.into())
-    //     .for_each(|rule| items.extend(gen_node(rule, context)));
 
     items
 }

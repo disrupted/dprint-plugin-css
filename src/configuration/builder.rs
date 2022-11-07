@@ -110,11 +110,8 @@ mod tests {
         let global_config = resolve_global_config(global_config, &Default::default()).config;
         let mut config_builder = ConfigurationBuilder::new();
         let config = config_builder.global_config(global_config).build();
-        assert_eq!(
-            config.new_line_kind == NewLineKind::CarriageReturnLineFeed,
-            true
-        );
-        assert_eq!(config.use_tabs, true);
+        assert!(config.new_line_kind == NewLineKind::CarriageReturnLineFeed);
+        assert!(config.use_tabs);
     }
 
     #[test]
@@ -122,7 +119,7 @@ mod tests {
         let global_config = resolve_global_config(HashMap::new(), &Default::default()).config;
         let mut config_builder = ConfigurationBuilder::new();
         let config = config_builder.global_config(global_config).build();
+        assert!(config.new_line_kind == NewLineKind::LineFeed);
         assert_eq!(config.indent_width, 4);
-        assert_eq!(config.new_line_kind == NewLineKind::LineFeed, true);
     }
 }

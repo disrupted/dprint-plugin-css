@@ -5,3 +5,72 @@ body{color:#000}
 body {
     color: #000;
 }
+
+== should format combined ==
+
+body   {
+  margin: 0;
+
+  font-family: -apple-system, BlinkMacSystemFont, "Ubuntu", sans-serif;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing: grayscale; }
+
+body {
+
+
+
+  background-color    :
+      black                  !important         ;
+}
+
+#id
+
+{
+  padding-left: 50vh;
+
+  height:   100em;
+}
+
+.class,
+
+
+.another-class {
+
+             background: #abcdef !important;
+
+}
+
+#element    {
+
+
+
+
+
+  width: 100%;
+
+}
+
+[expect]
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Ubuntu", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    background-color: black !important;
+}
+
+#id {
+    padding-left: 50vh;
+    height: 100em;
+}
+
+.class,
+.another-class {
+    background: #abcdef !important;
+}
+
+#element {
+    width: 100%;
+}

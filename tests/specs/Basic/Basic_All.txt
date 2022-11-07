@@ -51,6 +51,7 @@ body {
 }
 
 *  {  }
+::before,::after{}
 
 [expect]
 body {
@@ -80,3 +81,6 @@ body {
 }
 
 * {}
+
+::before,
+::after {}

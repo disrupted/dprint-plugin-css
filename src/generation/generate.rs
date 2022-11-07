@@ -135,6 +135,28 @@ fn gen_selector_instruction(simple_selectors: Vec<&SimpleSelector>) -> PrintItem
             let mut id = "#".to_owned();
             id.push_str(name);
             names.push(id);
+        } else if simple_selector.is_pseudo_element() {
+            let name = &simple_selector
+                .as_pseudo_element()
+                .unwrap()
+                .name
+                .as_literal()
+                .unwrap()
+                .name;
+            let mut pseudo = "::".to_owned();
+            pseudo.push_str(name);
+            names.push(pseudo);
+        } else if simple_selector.is_pseudo_class() {
+            let name = &simple_selector
+                .as_pseudo_class()
+                .unwrap()
+                .name
+                .as_literal()
+                .unwrap()
+                .name;
+            let mut pseudo = ":".to_owned();
+            pseudo.push_str(name);
+            names.push(pseudo);
         }
     }
 

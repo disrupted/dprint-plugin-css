@@ -1,6 +1,8 @@
 // use dprint_core::formatting::ir_helpers::gen_from_raw_string;
 use dprint_core::formatting::*;
-use raffia::ast::{ComplexSelectorChild, Declaration, QualifiedRule, SimpleSelector};
+use raffia::ast::{
+    ComplexSelectorChild, ComponentValue, Declaration, QualifiedRule, SimpleSelector,
+};
 
 use super::context::Context;
 use super::helpers::*;
@@ -83,6 +85,69 @@ fn gen_declaration_instruction<'a>(node: Declaration<'a>, context: &mut Context<
     items
 }
 
+fn parse_component_value(value: &ComponentValue) -> PrintItems {
+    let mut items = PrintItems::new();
+    if value.is_delimiter() {
+        match value.as_delimiter().unwrap().kind {
+            raffia::ast::DelimiterKind::Comma => items.push_str(", "),
+            raffia::ast::DelimiterKind::Solidus => items.push_str("\\ "),
+            raffia::ast::DelimiterKind::Semicolon => items.push_str("; "),
+        };
+    } else if value.is_interpolable_ident() {
+        items.push_str(
+            &value
+                .as_interpolable_ident()
+                .unwrap()
+                .as_literal()
+                .unwrap()
+                .name,
+        );
+    } else if value.is_interpolable_str() {
+        items.push_str("\"");
+        items.push_str(
+            &value
+                .as_interpolable_str()
+                .unwrap()
+                .as_literal()
+                .unwrap()
+                .value,
+        );
+        items.push_str("\"");
+    } else if value.is_dimension() {
+        let dimension = value.as_dimension().unwrap();
+        if dimension.is_length() {
+            let len = dimension.as_length().unwrap();
+            items.push_str(&len.value.value.to_string());
+            items.push_str(&len.unit.name);
+        }
+    } else if value.is_number() {
+        items.push_str(&value.as_number().unwrap().value.to_string());
+    } else if value.is_percentage() {
+        let percentage = value.as_percentage().unwrap();
+        items.push_str(&percentage.value.value.to_string());
+        items.push_str("%");
+    } else if value.is_hex_color() {
+        items.push_str("#");
+        items.push_str(&value.as_hex_color().unwrap().value);
+    } else if value.is_function() {
+        let name = &value.as_function().unwrap().name.as_literal().unwrap().name;
+
+        items.push_str(name);
+        items.push_str("(");
+        value
+            .as_function()
+            .unwrap()
+            .args
+            .iter()
+            .map(parse_component_value)
+            .for_each(|p| {
+                items.extend(p);
+            });
+        items.push_str(")");
+    }
+    items
+}
+
 fn gen_rule_instruction<'a>(node: QualifiedRule<'a>, context: &mut Context<'a>) -> PrintItems {
     let mut items = PrintItems::new();
     let sel = &node.selector.selectors;
@@ -160,49 +225,7 @@ fn gen_rule_instruction<'a>(node: QualifiedRule<'a>, context: &mut Context<'a>) 
 
                     // parse value
                     for value in declaration.value.iter() {
-                        if value.is_delimiter() {
-                            match value.as_delimiter().unwrap().kind {
-                                raffia::ast::DelimiterKind::Comma => items.push_str(", "),
-                                raffia::ast::DelimiterKind::Solidus => items.push_str("\\ "),
-                                raffia::ast::DelimiterKind::Semicolon => items.push_str("; "),
-                            };
-                        } else if value.is_interpolable_ident() {
-                            items.push_str(
-                                &value
-                                    .as_interpolable_ident()
-                                    .unwrap()
-                                    .as_literal()
-                                    .unwrap()
-                                    .name,
-                            );
-                        } else if value.is_interpolable_str() {
-                            items.push_str("\"");
-                            items.push_str(
-                                &value
-                                    .as_interpolable_str()
-                                    .unwrap()
-                                    .as_literal()
-                                    .unwrap()
-                                    .value,
-                            );
-                            items.push_str("\"");
-                        } else if value.is_dimension() {
-                            let dimension = value.as_dimension().unwrap();
-                            if dimension.is_length() {
-                                let len = dimension.as_length().unwrap();
-                                items.push_str(&len.value.value.to_string());
-                                items.push_str(&len.unit.name);
-                            }
-                        } else if value.is_number() {
-                            items.push_str(&value.as_number().unwrap().value.to_string());
-                        } else if value.is_percentage() {
-                            let percentage = value.as_percentage().unwrap();
-                            items.push_str(&percentage.value.value.to_string());
-                            items.push_str("%");
-                        } else if value.is_hex_color() {
-                            items.push_str("#");
-                            items.push_str(&value.as_hex_color().unwrap().value);
-                        }
+                        items.extend(parse_component_value(value));
                     }
 
                     if declaration.important.is_some() {

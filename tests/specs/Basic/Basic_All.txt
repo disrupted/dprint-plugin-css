@@ -46,6 +46,7 @@ body {
 
 
   width: 100%;
+  color: rgb(0, 128, 255);
 
 }
 
@@ -73,4 +74,5 @@ body {
 
 #element {
     width: 100%;
+    color: rgb(0, 128, 255);
 }

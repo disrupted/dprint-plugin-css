@@ -109,6 +109,17 @@ fn gen_rule_instruction<'a>(node: QualifiedRule<'a>, context: &mut Context<'a>) 
             let mut class = ".".to_owned();
             class.push_str(name);
             names.push(class);
+        } else if simple_selector.is_id() {
+            let name = &simple_selector
+                .as_id()
+                .unwrap()
+                .name
+                .as_literal()
+                .unwrap()
+                .name;
+            let mut id = "#".to_owned();
+            id.push_str(name);
+            names.push(id);
         }
     }
 

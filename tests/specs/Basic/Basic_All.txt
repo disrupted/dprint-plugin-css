@@ -59,7 +59,7 @@ selector:pseudo-class {
 abbr:where([title]) {
   text-decoration: underline dotted;
 }
-a[class~="logo"], a[href$=".org"], a[href*="example"], a[href^="http"],div[lang|="zh"]{
+a[class~="logo"], a[href$=".org"], a[href*="example"], a[href^="http"],div[lang|="zh"],a[href*="cAsE" s]{
     padding: 2px;
 }
 
@@ -107,6 +107,7 @@ a[class~="logo"],
 a[href$=".org"],
 a[href*="example"],
 a[href^="http"],
-div[lang|="zh"] {
+div[lang|="zh"],
+a[href*="cAsE" s] {
     padding: 2px;
 }

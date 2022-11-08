@@ -217,6 +217,10 @@ fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
                     items.extend(parse_interpolable_ident(value.as_ident().unwrap()));
                 }
             }
+            if let Some(modifier) = &attribute.modifier {
+                items.push_signal(Signal::SpaceIfNotTrailing);
+                items.extend(parse_interpolable_ident(&modifier.ident));
+            }
         }
         items.push_str("]");
     }

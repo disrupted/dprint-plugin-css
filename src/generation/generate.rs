@@ -2,8 +2,8 @@
 use dprint_core::formatting::*;
 use raffia::ast::{
     AtRule, Calc, ComplexSelector, ComplexSelectorChild, ComponentValue, Declaration, Delimiter,
-    Dimension, Function, InterpolableIdent, InterpolableStr, QualifiedRule, SimpleBlock,
-    SimpleSelector, Url,
+    Dimension, Function, InterpolableIdent, InterpolableStr, Number, QualifiedRule, Ratio,
+    SimpleBlock, SimpleSelector, Url,
 };
 use raffia::token::TokenWithSpan;
 
@@ -286,7 +286,7 @@ fn parse_component_value(value: &ComponentValue) -> PrintItems {
     } else if value.is_dimension() {
         items.extend(parse_dimension(value.as_dimension().unwrap()));
     } else if value.is_number() {
-        items.push_str(&value.as_number().unwrap().value.to_string());
+        items.extend(parse_number(value.as_number().unwrap()));
     } else if value.is_percentage() {
         items.push_str(&value.as_percentage().unwrap().value.value.to_string());
         items.push_str("%");
@@ -301,6 +301,8 @@ fn parse_component_value(value: &ComponentValue) -> PrintItems {
         items.extend(parse_url(value.as_url().unwrap()));
     } else if value.is_calc() {
         items.extend(parse_calc(value.as_calc().unwrap()));
+    } else if value.is_ratio() {
+        items.extend(parse_ratio(value.as_ratio().unwrap()));
     }
     items
 }
@@ -336,6 +338,12 @@ fn parse_dimension(dimension: &Dimension) -> PrintItems {
         items.push_str(&len.value.value.to_string());
         items.push_str(&len.unit.name);
     }
+    items
+}
+
+fn parse_number(number: &Number) -> PrintItems {
+    let mut items = PrintItems::new();
+    items.push_str(&number.value.to_string());
     items
 }
 
@@ -386,5 +394,13 @@ fn parse_calc(calc: &Calc) -> PrintItems {
         raffia::ast::CalcOperatorKind::Division => " / ",
     });
     items.extend(parse_component_value(&calc.right));
+    items
+}
+
+fn parse_ratio(ratio: &Ratio) -> PrintItems {
+    let mut items = PrintItems::new();
+    items.extend(parse_number(&ratio.numerator));
+    items.push_str("/");
+    items.extend(parse_number(&ratio.denominator));
     items
 }

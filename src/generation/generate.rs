@@ -215,22 +215,22 @@ fn parse_simple_block(block: SimpleBlock) -> PrintItems {
     let mut items = PrintItems::new();
     if block.statements.is_empty() {
         items.push_str(" {}");
-    } else {
-        items.push_str(" {");
-        items.push_signal(Signal::NewLine);
-
-        // parse statements inside block
-        block.statements.into_iter().for_each(|statement| {
-            items.extend(ir_helpers::with_indent({
-                let mut items = PrintItems::new();
-                items.extend(gen_node(statement.into()));
-                items.push_str(";");
-                items.push_signal(Signal::NewLine);
-                items
-            }));
-        });
-        items.push_str("}");
+        return items;
     }
+    items.push_str(" {");
+    items.push_signal(Signal::NewLine);
+
+    // parse statements inside block
+    block.statements.into_iter().for_each(|statement| {
+        items.extend(ir_helpers::with_indent({
+            let mut items = PrintItems::new();
+            items.extend(gen_node(statement.into()));
+            items.push_str(";");
+            items.push_signal(Signal::NewLine);
+            items
+        }));
+    });
+    items.push_str("}");
 
     items
 }

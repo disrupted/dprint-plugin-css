@@ -66,6 +66,7 @@ a[class~="logo"], a[href$=".org"], a[href*="example"], a[href^="http"],div[lang|
 font-family:"Lato";
 src:url(/fonts/Lato-Regular.ttf)format("truetype");
 src:url("http://example.com/fonts/Lato-Regular.ttf")format("truetype");
+        src:local();
 }
 
 [expect]
@@ -121,4 +122,5 @@ a[href*="cAsE" s] {
     font-family: "Lato";
     src: url(/fonts/Lato-Regular.ttf) format("truetype");
     src: url("http://example.com/fonts/Lato-Regular.ttf") format("truetype");
+    src: local();
 }

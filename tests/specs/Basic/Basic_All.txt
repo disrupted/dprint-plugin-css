@@ -56,6 +56,10 @@ body {
 selector:pseudo-class {
 }
 
+abbr:where([title]) {
+  text-decoration: underline dotted;
+}
+
 [expect]
 body {
     margin: 0;
@@ -91,3 +95,7 @@ body {
 }
 
 selector:pseudo-class {}
+
+abbr:where([title]) {
+    text-decoration: underline dotted;
+}

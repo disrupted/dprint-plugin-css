@@ -1,8 +1,8 @@
 // use dprint_core::formatting::ir_helpers::gen_from_raw_string;
 use dprint_core::formatting::*;
 use raffia::ast::{
-    ComplexSelectorChild, ComponentValue, Declaration, Delimiter, Dimension, Function,
-    InterpolableIdent, InterpolableStr, QualifiedRule, SimpleSelector,
+    ComplexSelector, ComplexSelectorChild, ComponentValue, Declaration, Delimiter, Dimension,
+    Function, InterpolableIdent, InterpolableStr, QualifiedRule, SimpleSelector,
 };
 use raffia::token::TokenWithSpan;
 
@@ -99,6 +99,26 @@ fn gen_rule_instruction(node: QualifiedRule) -> PrintItems {
     items
 }
 
+fn gen_complex_selector(complex_selector: &ComplexSelector) -> PrintItems {
+    let mut items = PrintItems::new();
+    complex_selector
+        .children
+        .iter()
+        .for_each(|c| items.extend(gen_complex_selector_child(c)));
+    items
+}
+
+fn gen_complex_selector_child(complex_selector_child: &ComplexSelectorChild) -> PrintItems {
+    let mut items = PrintItems::new();
+    complex_selector_child
+        .as_compound_selector()
+        .unwrap()
+        .children
+        .iter()
+        .for_each(|c| items.extend(gen_selector_instruction(c)));
+    items
+}
+
 fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
     let mut items = PrintItems::new();
     if simple_selector.is_type() {
@@ -158,9 +178,27 @@ fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
             .as_literal()
             .unwrap()
             .name;
-        let mut pseudo = ":".to_owned();
-        pseudo.push_str(name);
-        items.push_str(&pseudo);
+        items.push_str(":");
+        items.push_str(name);
+        let arg = &simple_selector.as_pseudo_class().unwrap().arg;
+        if arg.is_some() {
+            let arg = arg.as_ref().unwrap();
+            if arg.is_selector_list() {
+                items.push_str("(");
+                arg.as_selector_list()
+                    .unwrap()
+                    .selectors
+                    .iter()
+                    .for_each(|c| items.extend(gen_complex_selector(c)));
+                items.push_str(")");
+            }
+        }
+    } else if simple_selector.is_attribute() {
+        items.push_str("[");
+        items.extend(parse_interpolable_ident(
+            &simple_selector.as_attribute().unwrap().name.name,
+        ));
+        items.push_str("]");
     }
     items
 }

@@ -37,7 +37,7 @@ pub fn generate<'a>(ast: Ast<'a>, text: &'a str, config: &'a Configuration) -> P
     }
 
     for (i, node) in top_level_nodes.iter().enumerate() {
-        items.extend(gen_node(node.clone(), &mut context));
+        items.extend(gen_node(node.clone()));
         items.push_signal(Signal::NewLine);
         if let Some(next_node) = top_level_nodes.get(i + 1) {
             //     let text_between = &text[node.span().end..next_node.span().start];
@@ -50,7 +50,7 @@ pub fn generate<'a>(ast: Ast<'a>, text: &'a str, config: &'a Configuration) -> P
     items
 }
 
-fn gen_node<'a>(node: Node<'a>, context: &mut Context<'a>) -> PrintItems {
+fn gen_node(node: Node) -> PrintItems {
     let mut items = PrintItems::new();
 
     items.extend(match node {
@@ -220,20 +220,15 @@ fn parse_simple_block(block: &SimpleBlock) -> PrintItems {
         items.push_signal(Signal::NewLine);
 
         // parse statements inside block
-        for statement in &block.statements {
+        block.statements.iter().for_each(|statement| {
             items.extend(ir_helpers::with_indent({
                 let mut items = PrintItems::new();
-                // TODO: gen_node
-                if statement.is_declaration() {
-                    items.extend(gen_declaration_instruction(
-                        statement.as_declaration().unwrap(),
-                    ));
-                }
+                items.extend(gen_node(statement.clone().into()));
                 items.push_str(";");
                 items.push_signal(Signal::NewLine);
                 items
             }));
-        }
+        });
         items.push_str("}");
     }
 

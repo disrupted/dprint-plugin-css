@@ -318,10 +318,17 @@ fn parse_interpolable_str(str: &InterpolableStr) -> PrintItems {
 
 fn parse_dimension(dimension: &Dimension) -> PrintItems {
     let mut items = PrintItems::new();
-    if dimension.is_length() {
-        let len = dimension.as_length().unwrap();
-        items.push_str(&len.value.value.to_string());
-        items.push_str(&len.unit.name);
+    match dimension {
+        Dimension::Length(len) => {
+            items.push_str(&len.value.value.to_string());
+            items.push_str(&len.unit.name);
+        }
+        Dimension::Angle(_) => todo!(),
+        Dimension::Duration(_) => todo!(),
+        Dimension::Frequency(_) => todo!(),
+        Dimension::Resolution(_) => todo!(),
+        Dimension::Flex(_) => todo!(),
+        Dimension::Unknown(_) => todo!(),
     }
     items
 }

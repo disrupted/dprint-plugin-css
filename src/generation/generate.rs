@@ -3,7 +3,7 @@ use dprint_core::formatting::*;
 use raffia::ast::{
     AtRule, ComplexSelector, ComplexSelectorChild, ComponentValue, Declaration, Delimiter,
     Dimension, Function, InterpolableIdent, InterpolableStr, QualifiedRule, SimpleBlock,
-    SimpleSelector,
+    SimpleSelector, Url,
 };
 use raffia::token::TokenWithSpan;
 
@@ -299,7 +299,26 @@ fn parse_component_value(value: &ComponentValue) -> PrintItems {
         items.extend(parse_function(value.as_function().unwrap()));
     } else if value.is_token_with_span() {
         items.extend(parse_token_with_span(value.as_token_with_span().unwrap()));
+    } else if value.is_url() {
+        items.extend(parse_url(value.as_url().unwrap()));
     }
+    items
+}
+
+fn parse_url(url: &Url) -> PrintItems {
+    let mut items = PrintItems::new();
+    items.push_str(&url.name.name);
+    items.push_str("(");
+    if let Some(value) = &url.value {
+        if value.is_raw() {
+            items.push_str(&value.as_raw().unwrap().value);
+        } else if value.is_str() {
+            items.push_str("\"");
+            items.push_str(&value.as_str().unwrap().as_literal().unwrap().value);
+            items.push_str("\"");
+        }
+    }
+    items.push_str(")");
     items
 }
 

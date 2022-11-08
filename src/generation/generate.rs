@@ -307,11 +307,11 @@ fn parse_component_value(value: &ComponentValue) -> PrintItems {
 
 fn parse_delimiter(delimiter: &Delimiter) -> PrintItems {
     let mut items = PrintItems::new();
-    match delimiter.kind {
-        raffia::ast::DelimiterKind::Comma => items.push_str(","),
-        raffia::ast::DelimiterKind::Solidus => items.push_str("\\"),
-        raffia::ast::DelimiterKind::Semicolon => items.push_str(";"),
-    };
+    items.push_str(match delimiter.kind {
+        raffia::ast::DelimiterKind::Comma => ",",
+        raffia::ast::DelimiterKind::Solidus => "\\",
+        raffia::ast::DelimiterKind::Semicolon => ";",
+    });
     items
 }
 

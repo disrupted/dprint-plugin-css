@@ -22,13 +22,16 @@ pub fn generate<'a>(ast: Ast<'a>, text: &'a str, config: &'a Configuration) -> P
     );
 
     for comment in ast.comments {
-        if comment.is_line() {
-            items.push_str("//");
-            items.push_str(comment.as_line().unwrap().content);
-        } else if comment.is_block() {
-            items.push_str("/*");
-            items.push_str(comment.as_block().unwrap().content);
-            items.push_str("*/");
+        match comment {
+            raffia::token::Comment::Block(block) => {
+                items.push_str("/*");
+                items.push_str(block.content);
+                items.push_str("*/");
+            }
+            raffia::token::Comment::Line(line) => {
+                items.push_str("//");
+                items.push_str(line.content);
+            }
         }
         items.push_signal(Signal::NewLine);
     }

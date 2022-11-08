@@ -47,7 +47,7 @@ body {
 
   width: 100%;
   color: rgb(0, 128, 255);
-
+    margin-left:calc( var(  --logo-width)+  5px);
 }
 
 *  {  }
@@ -94,6 +94,7 @@ body {
 #element {
     width: 100%;
     color: rgb(0, 128, 255);
+    margin-left: calc(var(--logo-width) + 5px);
 }
 
 * {}

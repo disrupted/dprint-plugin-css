@@ -1,7 +1,7 @@
 // use dprint_core::formatting::ir_helpers::gen_from_raw_string;
 use dprint_core::formatting::*;
 use raffia::ast::{
-    AtRule, ComplexSelector, ComplexSelectorChild, ComponentValue, Declaration, Delimiter,
+    AtRule, Calc, ComplexSelector, ComplexSelectorChild, ComponentValue, Declaration, Delimiter,
     Dimension, Function, InterpolableIdent, InterpolableStr, QualifiedRule, SimpleBlock,
     SimpleSelector, Url,
 };
@@ -301,24 +301,9 @@ fn parse_component_value(value: &ComponentValue) -> PrintItems {
         items.extend(parse_token_with_span(value.as_token_with_span().unwrap()));
     } else if value.is_url() {
         items.extend(parse_url(value.as_url().unwrap()));
+    } else if value.is_calc() {
+        items.extend(parse_calc(value.as_calc().unwrap()));
     }
-    items
-}
-
-fn parse_url(url: &Url) -> PrintItems {
-    let mut items = PrintItems::new();
-    items.push_str(&url.name.name);
-    items.push_str("(");
-    if let Some(value) = &url.value {
-        if value.is_raw() {
-            items.push_str(&value.as_raw().unwrap().value);
-        } else if value.is_str() {
-            items.push_str("\"");
-            items.push_str(&value.as_str().unwrap().as_literal().unwrap().value);
-            items.push_str("\"");
-        }
-    }
-    items.push_str(")");
     items
 }
 
@@ -373,5 +358,37 @@ fn parse_token_with_span(node: &TokenWithSpan) -> PrintItems {
     if token.is_str() {
         items.push_str(token.as_str().unwrap().raw);
     }
+    items
+}
+
+fn parse_url(url: &Url) -> PrintItems {
+    let mut items = PrintItems::new();
+    items.push_str(&url.name.name);
+    items.push_str("(");
+    if let Some(value) = &url.value {
+        if value.is_raw() {
+            items.push_str(&value.as_raw().unwrap().value);
+        } else if value.is_str() {
+            items.push_str("\"");
+            items.push_str(&value.as_str().unwrap().as_literal().unwrap().value);
+            items.push_str("\"");
+        }
+    }
+    items.push_str(")");
+    items
+}
+
+fn parse_calc(calc: &Calc) -> PrintItems {
+    let mut items = PrintItems::new();
+    items.extend(parse_component_value(&calc.left));
+    items.push_signal(Signal::SpaceIfNotTrailing);
+    items.push_str(match calc.op.kind {
+        raffia::ast::CalcOperatorKind::Plus => "+",
+        raffia::ast::CalcOperatorKind::Minus => "-",
+        raffia::ast::CalcOperatorKind::Multiply => "*",
+        raffia::ast::CalcOperatorKind::Division => "/",
+    });
+    items.push_signal(Signal::SpaceIfNotTrailing);
+    items.extend(parse_component_value(&calc.right));
     items
 }

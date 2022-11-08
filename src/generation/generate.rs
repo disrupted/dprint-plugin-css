@@ -377,12 +377,14 @@ fn parse_url(url: &Url) -> PrintItems {
     items.push_str(&url.name.name);
     items.push_str("(");
     if let Some(value) = &url.value {
-        if value.is_raw() {
-            items.push_str(&value.as_raw().unwrap().value);
-        } else if value.is_str() {
-            items.push_str("\"");
-            items.push_str(&value.as_str().unwrap().as_literal().unwrap().value);
-            items.push_str("\"");
+        match value {
+            raffia::ast::UrlValue::Raw(raw) => items.push_str(&raw.value),
+            raffia::ast::UrlValue::SassInterpolated(_) => todo!(),
+            raffia::ast::UrlValue::Str(str) => {
+                items.push_str("\"");
+                items.push_str(&str.as_literal().unwrap().value);
+                items.push_str("\"");
+            }
         }
     }
     items.push_str(")");

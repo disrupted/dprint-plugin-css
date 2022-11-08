@@ -1,15 +1,16 @@
-use raffia::ast::{Declaration, QualifiedRule, Statement};
+use raffia::ast::{AtRule, Declaration, QualifiedRule, Statement};
 
 #[derive(Clone)]
 pub enum Node<'a> {
     Declaration(Declaration<'a>),
     QualifiedRule(QualifiedRule<'a>),
+    AtRule(AtRule<'a>),
 }
 
 impl<'a> From<Statement<'a>> for Node<'a> {
     fn from(rule: Statement<'a>) -> Node<'a> {
         match rule {
-            Statement::AtRule(_) => todo!(),
+            Statement::AtRule(at_rule) => Node::AtRule(at_rule),
             Statement::Declaration(declaration) => Node::Declaration(declaration),
             Statement::KeyframeBlock(_) => todo!(),
             Statement::LessVariableDeclaration(_) => todo!(),
@@ -30,26 +31,6 @@ impl<'a> From<Statement<'a>> for Node<'a> {
             Statement::SassVariableDeclaration(_) => todo!(),
             Statement::SassWarnAtRule(_) => todo!(),
             Statement::SassWhileAtRule(_) => todo!(),
-            // Statement::Media(media) => Node::Media(media),
-            // Statement::Import(_) => todo!(),
-            // Statement::Style(_) => todo!(),
-            // Statement::Keyframes(_) => todo!(),
-            // Statement::FontFace(_) => todo!(),
-            // Statement::Page(_) => todo!(),
-            // Statement::Supports(_) => todo!(),
-            // Statement::CounterStyle(_) => todo!(),
-            // Statement::Namespace(_) => todo!(),
-            // Statement::MozDocument(_) => todo!(),
-            // Statement::Nesting(_) => todo!(),
-            // Statement::Viewport(_) => todo!(),
-            // Statement::CustomMedia(_) => todo!(),
-            // Statement::Ignored => todo!(),
-            // Statement::FontPaletteValues(_) => todo!(),
-            // Statement::LayerStatement(_) => todo!(),
-            // Statement::LayerBlock(_) => todo!(),
-            // Statement::Property(_) => todo!(),
-            // Statement::Container(_) => todo!(),
-            // Statement::Unknown(_) => todo!(),
         }
     }
 }

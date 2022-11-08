@@ -62,6 +62,9 @@ abbr:where([title]) {
 a[class~="logo"], a[href$=".org"], a[href*="example"], a[href^="http"],div[lang|="zh"],a[href*="cAsE" s]{
     padding: 2px;
 }
+@font-face{
+font-family: sans-serif;
+}
 
 [expect]
 body {
@@ -110,4 +113,8 @@ a[href^="http"],
 div[lang|="zh"],
 a[href*="cAsE" s] {
     padding: 2px;
+}
+
+@font-face {
+    font-family: sans-serif;
 }

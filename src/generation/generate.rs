@@ -1,8 +1,9 @@
 // use dprint_core::formatting::ir_helpers::gen_from_raw_string;
 use dprint_core::formatting::*;
 use raffia::ast::{
-    ComplexSelector, ComplexSelectorChild, ComponentValue, Declaration, Delimiter, Dimension,
-    Function, InterpolableIdent, InterpolableStr, QualifiedRule, SimpleSelector,
+    AtRule, ComplexSelector, ComplexSelectorChild, ComponentValue, Declaration, Delimiter,
+    Dimension, Function, InterpolableIdent, InterpolableStr, QualifiedRule, SimpleBlock,
+    SimpleSelector,
 };
 use raffia::token::TokenWithSpan;
 
@@ -50,13 +51,14 @@ fn gen_node<'a>(node: Node<'a>, context: &mut Context<'a>) -> PrintItems {
     let mut items = PrintItems::new();
 
     items.extend(match node {
-        Node::QualifiedRule(node) => gen_rule_instruction(node),
+        Node::QualifiedRule(node) => gen_qualified_rule_instruction(node),
         Node::Declaration(node) => gen_declaration_instruction(&node),
+        Node::AtRule(node) => gen_at_rule_instruction(node),
     });
     items
 }
 
-fn gen_rule_instruction(node: QualifiedRule) -> PrintItems {
+fn gen_qualified_rule_instruction(node: QualifiedRule) -> PrintItems {
     let mut items = PrintItems::new();
     let sel = &node.selector.selectors;
     let complex_selectors: Vec<&ComplexSelectorChild> =
@@ -73,27 +75,19 @@ fn gen_rule_instruction(node: QualifiedRule) -> PrintItems {
         }
     }
 
-    if node.block.statements.is_empty() {
-        items.push_str(" {}");
-    } else {
-        items.push_str(" {");
-        items.push_signal(Signal::NewLine);
+    items.extend(parse_simple_block(&node.block));
 
-        // parse statements inside block
-        for statement in node.block.statements {
-            items.extend(ir_helpers::with_indent({
-                let mut items = PrintItems::new();
-                if statement.is_declaration() {
-                    items.extend(gen_declaration_instruction(
-                        statement.as_declaration().unwrap(),
-                    ));
-                }
-                items.push_str(";");
-                items.push_signal(Signal::NewLine);
-                items
-            }));
-        }
-        items.push_str("}");
+    items
+}
+
+fn gen_at_rule_instruction(node: AtRule) -> PrintItems {
+    let mut items = PrintItems::new();
+
+    items.push_str("@");
+    items.push_str(&node.name.name);
+
+    if let Some(block) = &node.block {
+        items.extend(parse_simple_block(block));
     }
 
     items
@@ -237,6 +231,34 @@ fn gen_declaration_instruction(node: &Declaration) -> PrintItems {
     if node.important.is_some() {
         items.push_str(" !important");
     }
+    items
+}
+
+fn parse_simple_block(block: &SimpleBlock) -> PrintItems {
+    let mut items = PrintItems::new();
+    if block.statements.is_empty() {
+        items.push_str(" {}");
+    } else {
+        items.push_str(" {");
+        items.push_signal(Signal::NewLine);
+
+        // parse statements inside block
+        for statement in &block.statements {
+            items.extend(ir_helpers::with_indent({
+                let mut items = PrintItems::new();
+                if statement.is_declaration() {
+                    items.extend(gen_declaration_instruction(
+                        statement.as_declaration().unwrap(),
+                    ));
+                }
+                items.push_str(";");
+                items.push_signal(Signal::NewLine);
+                items
+            }));
+        }
+        items.push_str("}");
+    }
+
     items
 }
 

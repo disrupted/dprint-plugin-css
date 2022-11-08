@@ -275,35 +275,40 @@ fn parse_component_values(values: &[ComponentValue]) -> PrintItems {
 
 fn parse_component_value(value: &ComponentValue) -> PrintItems {
     let mut items = PrintItems::new();
-    if value.is_delimiter() {
-        items.extend(parse_delimiter(value.as_delimiter().unwrap()));
-    } else if value.is_interpolable_ident() {
-        items.extend(parse_interpolable_ident(
-            value.as_interpolable_ident().unwrap(),
-        ));
-    } else if value.is_interpolable_str() {
-        items.extend(parse_interpolable_str(value.as_interpolable_str().unwrap()));
-    } else if value.is_dimension() {
-        items.extend(parse_dimension(value.as_dimension().unwrap()));
-    } else if value.is_number() {
-        items.extend(parse_number(value.as_number().unwrap()));
-    } else if value.is_percentage() {
-        items.push_str(&value.as_percentage().unwrap().value.value.to_string());
-        items.push_str("%");
-    } else if value.is_hex_color() {
-        items.push_str("#");
-        items.push_str(&value.as_hex_color().unwrap().value);
-    } else if value.is_function() {
-        items.extend(parse_function(value.as_function().unwrap()));
-    } else if value.is_token_with_span() {
-        items.extend(parse_token_with_span(value.as_token_with_span().unwrap()));
-    } else if value.is_url() {
-        items.extend(parse_url(value.as_url().unwrap()));
-    } else if value.is_calc() {
-        items.extend(parse_calc(value.as_calc().unwrap()));
-    } else if value.is_ratio() {
-        items.extend(parse_ratio(value.as_ratio().unwrap()));
-    }
+    match value {
+        ComponentValue::BracketBlock(_) => todo!(),
+        ComponentValue::Calc(node) => items.extend(parse_calc(node)),
+        ComponentValue::Delimiter(node) => items.extend(parse_delimiter(node)),
+        ComponentValue::Dimension(node) => items.extend(parse_dimension(node)),
+        ComponentValue::Function(node) => items.extend(parse_function(node)),
+        ComponentValue::HexColor(node) => {
+            items.push_str("#");
+            items.push_str(&node.value);
+        }
+        ComponentValue::IdSelector(_) => todo!(),
+        ComponentValue::InterpolableIdent(node) => items.extend(parse_interpolable_ident(node)),
+        ComponentValue::InterpolableStr(node) => items.extend(parse_interpolable_str(node)),
+        ComponentValue::LayerName(_) => todo!(),
+        ComponentValue::LessVariable(_) => todo!(),
+        ComponentValue::LessVariableVariable(_) => todo!(),
+        ComponentValue::Number(node) => items.extend(parse_number(node)),
+        ComponentValue::Percentage(node) => {
+            items.push_str(&node.value.value.to_string());
+            items.push_str("%");
+        }
+        ComponentValue::Ratio(node) => items.extend(parse_ratio(node)),
+        ComponentValue::SassBinaryExpression(_) => todo!(),
+        ComponentValue::SassMap(_) => todo!(),
+        ComponentValue::SassNamespacedExpression(_) => todo!(),
+        ComponentValue::SassNestingDeclaration(_) => todo!(),
+        ComponentValue::SassParenthesizedExpression(_) => todo!(),
+        ComponentValue::SassParentSelector(_) => todo!(),
+        ComponentValue::SassUnaryExpression(_) => todo!(),
+        ComponentValue::SassVariable(_) => todo!(),
+        ComponentValue::TokenWithSpan(node) => items.extend(parse_token_with_span(node)),
+        ComponentValue::UnicodeRange(_) => todo!(),
+        ComponentValue::Url(node) => items.extend(parse_url(node)),
+    };
     items
 }
 

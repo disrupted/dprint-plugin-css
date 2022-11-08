@@ -379,14 +379,12 @@ fn parse_url(url: &Url) -> PrintItems {
 fn parse_calc(calc: &Calc) -> PrintItems {
     let mut items = PrintItems::new();
     items.extend(parse_component_value(&calc.left));
-    items.push_signal(Signal::SpaceIfNotTrailing);
     items.push_str(match calc.op.kind {
-        raffia::ast::CalcOperatorKind::Plus => "+",
-        raffia::ast::CalcOperatorKind::Minus => "-",
-        raffia::ast::CalcOperatorKind::Multiply => "*",
-        raffia::ast::CalcOperatorKind::Division => "/",
+        raffia::ast::CalcOperatorKind::Plus => " + ",
+        raffia::ast::CalcOperatorKind::Minus => " - ",
+        raffia::ast::CalcOperatorKind::Multiply => " * ",
+        raffia::ast::CalcOperatorKind::Division => " / ",
     });
-    items.push_signal(Signal::SpaceIfNotTrailing);
     items.extend(parse_component_value(&calc.right));
     items
 }

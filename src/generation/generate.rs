@@ -146,10 +146,13 @@ fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
                         raffia::ast::AttributeSelectorMatcherKind::Suffix => "$=",
                         raffia::ast::AttributeSelectorMatcherKind::Substring => "*=",
                     });
-                    if value.is_str() {
-                        items.extend(parse_interpolable_str(value.as_str().unwrap()));
-                    } else if value.is_ident() {
-                        items.extend(parse_interpolable_ident(value.as_ident().unwrap()));
+                    match value {
+                        raffia::ast::AttributeSelectorValue::Ident(ident) => {
+                            items.extend(parse_interpolable_ident(ident))
+                        }
+                        raffia::ast::AttributeSelectorValue::Str(str) => {
+                            items.extend(parse_interpolable_str(str))
+                        }
                     }
                 }
                 if let Some(modifier) = &attribute.modifier {
@@ -220,6 +223,7 @@ fn parse_simple_block(block: &SimpleBlock) -> PrintItems {
         for statement in &block.statements {
             items.extend(ir_helpers::with_indent({
                 let mut items = PrintItems::new();
+                // TODO: gen_node
                 if statement.is_declaration() {
                     items.extend(gen_declaration_instruction(
                         statement.as_declaration().unwrap(),

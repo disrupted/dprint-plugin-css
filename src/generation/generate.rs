@@ -195,16 +195,14 @@ fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
         let attribute = simple_selector.as_attribute().unwrap();
         if let Some(value) = &attribute.value {
             if let Some(matcher) = &attribute.matcher {
-                match matcher.kind {
-                    raffia::ast::AttributeSelectorMatcherKind::Exact => items.push_str("="),
-                    raffia::ast::AttributeSelectorMatcherKind::MatchWord => items.push_str("~="),
-                    raffia::ast::AttributeSelectorMatcherKind::ExactOrPrefixThenHyphen => {
-                        items.push_str("|=")
-                    }
-                    raffia::ast::AttributeSelectorMatcherKind::Prefix => items.push_str("^="),
-                    raffia::ast::AttributeSelectorMatcherKind::Suffix => items.push_str("$="),
-                    raffia::ast::AttributeSelectorMatcherKind::Substring => items.push_str("*="),
-                }
+                items.push_str(match matcher.kind {
+                    raffia::ast::AttributeSelectorMatcherKind::Exact => "=",
+                    raffia::ast::AttributeSelectorMatcherKind::MatchWord => "~=",
+                    raffia::ast::AttributeSelectorMatcherKind::ExactOrPrefixThenHyphen => "|=",
+                    raffia::ast::AttributeSelectorMatcherKind::Prefix => "^=",
+                    raffia::ast::AttributeSelectorMatcherKind::Suffix => "$=",
+                    raffia::ast::AttributeSelectorMatcherKind::Substring => "*=",
+                });
                 if value.is_str() {
                     items.extend(parse_interpolable_str(value.as_str().unwrap()));
                 } else if value.is_ident() {

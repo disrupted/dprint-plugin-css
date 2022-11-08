@@ -118,107 +118,80 @@ fn gen_complex_selector_child(complex_selector_child: &ComplexSelectorChild) -> 
 
 fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
     let mut items = PrintItems::new();
-    if simple_selector.is_type() {
-        let typ = simple_selector.as_type().unwrap();
-        if typ.is_tag_name() {
-            let name = typ
-                .as_tag_name()
-                .unwrap()
-                .name
-                .name
-                .as_literal()
-                .unwrap()
-                .name
-                .to_string();
-            items.push_str(&name);
-        } else if typ.is_universal() {
-            items.push_str("*");
+    match simple_selector {
+        SimpleSelector::Class(class) => {
+            items.push_str(".");
+            items.push_str(&class.name.as_literal().unwrap().name);
         }
-    } else if simple_selector.is_class() {
-        let name = &simple_selector
-            .as_class()
-            .unwrap()
-            .name
-            .as_literal()
-            .unwrap()
-            .name;
-        let mut class = ".".to_owned();
-        class.push_str(name);
-        items.push_str(&class);
-    } else if simple_selector.is_id() {
-        let name = &simple_selector
-            .as_id()
-            .unwrap()
-            .name
-            .as_literal()
-            .unwrap()
-            .name;
-        let mut id = "#".to_owned();
-        id.push_str(name);
-        items.push_str(&id);
-    } else if simple_selector.is_pseudo_element() {
-        let name = &simple_selector
-            .as_pseudo_element()
-            .unwrap()
-            .name
-            .as_literal()
-            .unwrap()
-            .name;
-        let mut pseudo = "::".to_owned();
-        pseudo.push_str(name);
-        items.push_str(&pseudo);
-    } else if simple_selector.is_pseudo_class() {
-        let name = &simple_selector
-            .as_pseudo_class()
-            .unwrap()
-            .name
-            .as_literal()
-            .unwrap()
-            .name;
-        items.push_str(":");
-        items.push_str(name);
-        let arg = &simple_selector.as_pseudo_class().unwrap().arg;
-        if arg.is_some() {
-            let arg = arg.as_ref().unwrap();
-            if arg.is_selector_list() {
-                items.push_str("(");
-                arg.as_selector_list()
-                    .unwrap()
-                    .selectors
-                    .iter()
-                    .for_each(|c| items.extend(gen_complex_selector(c)));
-                items.push_str(")");
+        SimpleSelector::Id(id) => {
+            items.push_str("#");
+            items.push_str(&id.name.as_literal().unwrap().name);
+        }
+        SimpleSelector::Type(typ) => match typ {
+            raffia::ast::TypeSelector::TagName(tag_name) => {
+                items.push_str(&tag_name.name.name.as_literal().unwrap().name);
             }
-        }
-    } else if simple_selector.is_attribute() {
-        items.push_str("[");
-        items.extend(parse_interpolable_ident(
-            &simple_selector.as_attribute().unwrap().name.name,
-        ));
-        let attribute = simple_selector.as_attribute().unwrap();
-        if let Some(value) = &attribute.value {
-            if let Some(matcher) = &attribute.matcher {
-                items.push_str(match matcher.kind {
-                    raffia::ast::AttributeSelectorMatcherKind::Exact => "=",
-                    raffia::ast::AttributeSelectorMatcherKind::MatchWord => "~=",
-                    raffia::ast::AttributeSelectorMatcherKind::ExactOrPrefixThenHyphen => "|=",
-                    raffia::ast::AttributeSelectorMatcherKind::Prefix => "^=",
-                    raffia::ast::AttributeSelectorMatcherKind::Suffix => "$=",
-                    raffia::ast::AttributeSelectorMatcherKind::Substring => "*=",
-                });
-                if value.is_str() {
-                    items.extend(parse_interpolable_str(value.as_str().unwrap()));
-                } else if value.is_ident() {
-                    items.extend(parse_interpolable_ident(value.as_ident().unwrap()));
+            raffia::ast::TypeSelector::Universal(_) => items.push_str("*"),
+        },
+        SimpleSelector::Attribute(attribute) => {
+            items.push_str("[");
+            items.extend(parse_interpolable_ident(&attribute.name.name));
+            if let Some(value) = &attribute.value {
+                if let Some(matcher) = &attribute.matcher {
+                    items.push_str(match matcher.kind {
+                        raffia::ast::AttributeSelectorMatcherKind::Exact => "=",
+                        raffia::ast::AttributeSelectorMatcherKind::MatchWord => "~=",
+                        raffia::ast::AttributeSelectorMatcherKind::ExactOrPrefixThenHyphen => "|=",
+                        raffia::ast::AttributeSelectorMatcherKind::Prefix => "^=",
+                        raffia::ast::AttributeSelectorMatcherKind::Suffix => "$=",
+                        raffia::ast::AttributeSelectorMatcherKind::Substring => "*=",
+                    });
+                    if value.is_str() {
+                        items.extend(parse_interpolable_str(value.as_str().unwrap()));
+                    } else if value.is_ident() {
+                        items.extend(parse_interpolable_ident(value.as_ident().unwrap()));
+                    }
+                }
+                if let Some(modifier) = &attribute.modifier {
+                    items.push_signal(Signal::SpaceIfNotTrailing);
+                    items.extend(parse_interpolable_ident(&modifier.ident));
                 }
             }
-            if let Some(modifier) = &attribute.modifier {
-                items.push_signal(Signal::SpaceIfNotTrailing);
-                items.extend(parse_interpolable_ident(&modifier.ident));
+            items.push_str("]");
+        }
+        SimpleSelector::PseudoClass(pseudo_class) => {
+            items.push_str(":");
+            items.push_str(&pseudo_class.name.as_literal().unwrap().name);
+            if let Some(arg) = &pseudo_class.arg {
+                match &arg {
+                    raffia::ast::PseudoClassSelectorArg::CompoundSelector(_) => todo!(),
+                    raffia::ast::PseudoClassSelectorArg::CompoundSelectorList(_) => todo!(),
+                    raffia::ast::PseudoClassSelectorArg::Ident(_) => todo!(),
+                    raffia::ast::PseudoClassSelectorArg::LanguageRangeList(_) => todo!(),
+                    raffia::ast::PseudoClassSelectorArg::Nth(_) => todo!(),
+                    raffia::ast::PseudoClassSelectorArg::Number(_) => todo!(),
+                    raffia::ast::PseudoClassSelectorArg::RelativeSelectorList(_) => todo!(),
+                    raffia::ast::PseudoClassSelectorArg::SelectorList(selector_list) => {
+                        items.push_str("(");
+                        arg.as_selector_list()
+                            .unwrap()
+                            .selectors
+                            .iter()
+                            .for_each(|c| items.extend(gen_complex_selector(c)));
+                        items.push_str(")");
+                    }
+                    raffia::ast::PseudoClassSelectorArg::TokenSeq(_) => todo!(),
+                }
             }
         }
-        items.push_str("]");
+        SimpleSelector::PseudoElement(pseudo_element) => {
+            items.push_str("::");
+            items.push_str(&pseudo_element.name.as_literal().unwrap().name);
+        }
+        SimpleSelector::Nesting(nesting) => todo!(),
+        SimpleSelector::SassPlaceholder(_) => todo!(),
     }
+
     items
 }
 

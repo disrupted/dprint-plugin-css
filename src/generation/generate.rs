@@ -78,7 +78,7 @@ fn gen_qualified_rule_instruction(node: QualifiedRule) -> PrintItems {
         }
     }
 
-    items.extend(parse_simple_block(&node.block));
+    items.extend(parse_simple_block(node.block));
 
     items
 }
@@ -89,7 +89,7 @@ fn gen_at_rule_instruction(node: AtRule) -> PrintItems {
     items.push_str("@");
     items.push_str(&node.name.name);
 
-    if let Some(block) = &node.block {
+    if let Some(block) = node.block {
         items.extend(parse_simple_block(block));
     }
 
@@ -211,7 +211,7 @@ fn gen_declaration_instruction(node: &Declaration) -> PrintItems {
     items
 }
 
-fn parse_simple_block(block: &SimpleBlock) -> PrintItems {
+fn parse_simple_block(block: SimpleBlock) -> PrintItems {
     let mut items = PrintItems::new();
     if block.statements.is_empty() {
         items.push_str(" {}");
@@ -220,10 +220,10 @@ fn parse_simple_block(block: &SimpleBlock) -> PrintItems {
         items.push_signal(Signal::NewLine);
 
         // parse statements inside block
-        block.statements.iter().for_each(|statement| {
+        block.statements.into_iter().for_each(|statement| {
             items.extend(ir_helpers::with_indent({
                 let mut items = PrintItems::new();
-                items.extend(gen_node(statement.clone().into()));
+                items.extend(gen_node(statement.into()));
                 items.push_str(";");
                 items.push_signal(Signal::NewLine);
                 items

@@ -22,12 +22,12 @@ pub fn generate<'a>(ast: Ast<'a>, text: &'a str, config: &'a Configuration) -> P
 
     for comment in ast.comments {
         if comment.is_line() {
-            items.push_str("// ");
+            items.push_str("//");
             items.push_str(comment.as_line().unwrap().content);
         } else if comment.is_block() {
-            items.push_str("/* ");
+            items.push_str("/*");
             items.push_str(comment.as_block().unwrap().content);
-            items.push_str(" */");
+            items.push_str("*/");
         }
         items.push_signal(Signal::NewLine);
     }
@@ -208,14 +208,23 @@ fn gen_declaration_instruction(node: &Declaration) -> PrintItems {
     let ident = node.name.as_literal().unwrap().raw;
     items.push_str(ident);
     items.push_str(": ");
-
-    // parse value
-    node.value
-        .iter()
-        .for_each(|value| items.extend(parse_component_value(value)));
+    items.extend(parse_component_values(&node.value));
 
     if node.important.is_some() {
         items.push_str(" !important");
+    }
+    items
+}
+
+fn parse_component_values(values: &[ComponentValue]) -> PrintItems {
+    let mut items = PrintItems::new();
+    for (i, value) in values.iter().enumerate() {
+        items.extend(parse_component_value(value));
+        if let Some(next_node) = values.get(i + 1) {
+            if !next_node.is_delimiter() {
+                items.push_signal(Signal::SpaceIfNotTrailing);
+            }
+        }
     }
     items
 }
@@ -251,9 +260,9 @@ fn parse_component_value(value: &ComponentValue) -> PrintItems {
 fn parse_delimiter(delimiter: &Delimiter) -> PrintItems {
     let mut items = PrintItems::new();
     match delimiter.kind {
-        raffia::ast::DelimiterKind::Comma => items.push_str(", "),
-        raffia::ast::DelimiterKind::Solidus => items.push_str("\\ "),
-        raffia::ast::DelimiterKind::Semicolon => items.push_str("; "),
+        raffia::ast::DelimiterKind::Comma => items.push_str(","),
+        raffia::ast::DelimiterKind::Solidus => items.push_str("\\"),
+        raffia::ast::DelimiterKind::Semicolon => items.push_str(";"),
     };
     items
 }
@@ -288,13 +297,7 @@ fn parse_function(function: &Function) -> PrintItems {
 
     items.push_str(name);
     items.push_str("(");
-    function
-        .args
-        .iter()
-        .map(parse_component_value)
-        .for_each(|p| {
-            items.extend(p);
-        });
+    items.extend(parse_component_values(&function.args));
     items.push_str(")");
     items
 }

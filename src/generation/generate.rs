@@ -3,7 +3,8 @@ use dprint_core::formatting::*;
 use raffia::ast::{
     AtRule, Calc, Combinator, ComplexSelector, ComplexSelectorChild, ComponentValue,
     CompoundSelector, Declaration, Delimiter, Dimension, Function, InterpolableIdent,
-    InterpolableStr, Number, QualifiedRule, Ratio, SelectorList, SimpleBlock, SimpleSelector, Url,
+    InterpolableStr, NsPrefix, Number, QualifiedRule, Ratio, SelectorList, SimpleBlock,
+    SimpleSelector, Url, WqName,
 };
 use raffia::token::TokenWithSpan;
 
@@ -136,6 +137,30 @@ fn parse_combinator(combinator: &Combinator) -> PrintItems {
     items
 }
 
+fn parse_wq_name(wq_name: &WqName) -> PrintItems {
+    let mut items = PrintItems::new();
+
+    if let Some(ns_prefix) = &wq_name.prefix {
+        items.extend(parse_ns_prefix(ns_prefix));
+    }
+    items.extend(parse_interpolable_ident(&wq_name.name));
+    items
+}
+
+fn parse_ns_prefix(ns_prefix: &NsPrefix) -> PrintItems {
+    let mut items = PrintItems::new();
+    if let Some(kind) = &ns_prefix.kind {
+        match kind {
+            raffia::ast::NsPrefixKind::Ident(ident) => {
+                items.extend(parse_interpolable_ident(ident))
+            }
+            raffia::ast::NsPrefixKind::Universal(_) => items.push_str("*"),
+        }
+        items.push_str("|");
+    }
+    items
+}
+
 fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
     let mut items = PrintItems::new();
     match simple_selector {
@@ -152,23 +177,15 @@ fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
                 items.push_str(&tag_name.name.name.as_literal().unwrap().name);
             }
             raffia::ast::TypeSelector::Universal(universal) => {
-                if let Some(prefix) = &universal.prefix {
-                    if let Some(kind) = &prefix.kind {
-                        match kind {
-                            raffia::ast::NsPrefixKind::Ident(ident) => {
-                                items.extend(parse_interpolable_ident(ident))
-                            }
-                            raffia::ast::NsPrefixKind::Universal(_) => items.push_str("*"),
-                        }
-                        items.push_str("|");
-                    }
+                if let Some(ns_prefix) = &universal.prefix {
+                    items.extend(parse_ns_prefix(ns_prefix))
                 }
                 items.push_str("*");
             }
         },
         SimpleSelector::Attribute(attribute) => {
             items.push_str("[");
-            items.extend(parse_interpolable_ident(&attribute.name.name));
+            items.extend(parse_wq_name(&attribute.name));
             if let Some(value) = &attribute.value {
                 if let Some(matcher) = &attribute.matcher {
                     items.push_str(match matcher.kind {

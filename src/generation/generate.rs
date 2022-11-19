@@ -173,9 +173,30 @@ fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
             items.push_str(&pseudo_class.name.as_literal().unwrap().name);
             if let Some(arg) = &pseudo_class.arg {
                 match &arg {
-                    raffia::ast::PseudoClassSelectorArg::CompoundSelector(_) => todo!(),
-                    raffia::ast::PseudoClassSelectorArg::CompoundSelectorList(_) => todo!(),
-                    raffia::ast::PseudoClassSelectorArg::Ident(_) => todo!(),
+                    raffia::ast::PseudoClassSelectorArg::CompoundSelector(compound_selector) => {
+                        compound_selector
+                            .children
+                            .iter()
+                            .for_each(|simple_selector| {
+                                items.extend(gen_selector_instruction(simple_selector))
+                            })
+                    }
+                    raffia::ast::PseudoClassSelectorArg::CompoundSelectorList(
+                        compound_selector_list,
+                    ) => compound_selector_list
+                        .selectors
+                        .iter()
+                        .for_each(|compound_selector| {
+                            compound_selector
+                                .children
+                                .iter()
+                                .for_each(|simple_selector| {
+                                    items.extend(gen_selector_instruction(simple_selector))
+                                })
+                        }),
+                    raffia::ast::PseudoClassSelectorArg::Ident(ident) => {
+                        items.extend(parse_interpolable_ident(ident))
+                    }
                     raffia::ast::PseudoClassSelectorArg::LanguageRangeList(_) => todo!(),
                     raffia::ast::PseudoClassSelectorArg::Nth(_) => todo!(),
                     raffia::ast::PseudoClassSelectorArg::Number(_) => todo!(),
@@ -394,7 +415,7 @@ fn parse_token_with_span(node: &TokenWithSpan) -> PrintItems {
         raffia::token::Token::LParen(_) => "(",
         raffia::token::Token::Minus(_) => "-",
         raffia::token::Token::Number(number) => number.raw,
-        raffia::token::Token::NumberSign(_) => todo!(),
+        raffia::token::Token::NumberSign(_) => "#",
         raffia::token::Token::Percent(_) => "%",
         raffia::token::Token::Percentage(_) => "%",
         raffia::token::Token::Plus(_) => "+",

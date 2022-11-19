@@ -322,7 +322,7 @@ fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
             items.push_str("::");
             items.push_str(&pseudo_element.name.as_literal().unwrap().name);
         }
-        SimpleSelector::Nesting(_) => todo!(),
+        SimpleSelector::Nesting(_) => items.push_str("&"),
         SimpleSelector::SassPlaceholder(_) => todo!(),
     }
 
@@ -339,6 +339,8 @@ fn gen_declaration_instruction(node: &Declaration) -> PrintItems {
     if node.important.is_some() {
         items.push_str(" !important");
     }
+
+    items.push_str(";");
     items
 }
 
@@ -356,7 +358,6 @@ fn parse_simple_block(block: SimpleBlock) -> PrintItems {
         items.extend(ir_helpers::with_indent({
             let mut items = PrintItems::new();
             items.extend(gen_node(statement.into()));
-            items.push_str(";");
             items.push_signal(Signal::NewLine);
             items
         }));

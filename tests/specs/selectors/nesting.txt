@@ -1,0 +1,13 @@
+== should format nesting selectors ==
+.foo {
+  color:blue;
+  &> .bar{ color: red; }
+}
+
+[expect]
+.foo {
+    color: blue;
+    & > .bar {
+        color: red;
+    }
+}

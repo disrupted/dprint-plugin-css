@@ -437,7 +437,7 @@ fn parse_interpolable_ident(ident: &InterpolableIdent) -> PrintItems {
 fn parse_interpolable_str(str: &InterpolableStr) -> PrintItems {
     let mut items = PrintItems::new();
     items.push_str("\"");
-    items.push_str(&str.as_literal().unwrap().value);
+    items.push_str(&str.as_literal().unwrap().value.replace('\"', "\\\""));
     items.push_str("\"");
     items
 }
@@ -549,11 +549,7 @@ fn parse_url(url: &Url) -> PrintItems {
         match value {
             raffia::ast::UrlValue::Raw(raw) => items.push_str(&raw.value),
             raffia::ast::UrlValue::SassInterpolated(_) => todo!(),
-            raffia::ast::UrlValue::Str(str) => {
-                items.push_str("\"");
-                items.push_str(&str.as_literal().unwrap().value);
-                items.push_str("\"");
-            }
+            raffia::ast::UrlValue::Str(str) => items.extend(parse_interpolable_str(str)),
         }
     }
     items.push_str(")");

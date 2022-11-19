@@ -1,9 +1,9 @@
 // use dprint_core::formatting::ir_helpers::gen_from_raw_string;
 use dprint_core::formatting::*;
 use raffia::ast::{
-    AtRule, Calc, Combinator, ComplexSelector, ComplexSelectorChild, ComponentValue, Declaration,
-    Delimiter, Dimension, Function, InterpolableIdent, InterpolableStr, Number, QualifiedRule,
-    Ratio, SelectorList, SimpleBlock, SimpleSelector, Url,
+    AtRule, Calc, Combinator, ComplexSelector, ComplexSelectorChild, ComponentValue,
+    CompoundSelector, Declaration, Delimiter, Dimension, Function, InterpolableIdent,
+    InterpolableStr, Number, QualifiedRule, Ratio, SelectorList, SimpleBlock, SimpleSelector, Url,
 };
 use raffia::token::TokenWithSpan;
 
@@ -107,12 +107,20 @@ fn gen_complex_selector(complex_selector: &ComplexSelector) -> PrintItems {
 fn gen_complex_selector_child(complex_selector_child: &ComplexSelectorChild) -> PrintItems {
     let mut items = PrintItems::new();
     match complex_selector_child {
-        ComplexSelectorChild::CompoundSelector(compound_selector) => compound_selector
-            .children
-            .iter()
-            .for_each(|simple_selector| items.extend(gen_selector_instruction(simple_selector))),
+        ComplexSelectorChild::CompoundSelector(compound_selector) => {
+            items.extend(gen_compound_selector(compound_selector))
+        }
         ComplexSelectorChild::Combinator(combinator) => items.extend(parse_combinator(combinator)),
     }
+    items
+}
+
+fn gen_compound_selector(compound_selector: &CompoundSelector) -> PrintItems {
+    let mut items = PrintItems::new();
+    compound_selector
+        .children
+        .iter()
+        .for_each(|simple_selector| items.extend(gen_selector_instruction(simple_selector)));
     items
 }
 
@@ -181,12 +189,7 @@ fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
                 items.push_str("(");
                 match &arg {
                     raffia::ast::PseudoClassSelectorArg::CompoundSelector(compound_selector) => {
-                        compound_selector
-                            .children
-                            .iter()
-                            .for_each(|simple_selector| {
-                                items.extend(gen_selector_instruction(simple_selector))
-                            })
+                        items.extend(gen_compound_selector(compound_selector))
                     }
                     raffia::ast::PseudoClassSelectorArg::CompoundSelectorList(
                         compound_selector_list,
@@ -194,12 +197,7 @@ fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
                         .selectors
                         .iter()
                         .for_each(|compound_selector| {
-                            compound_selector
-                                .children
-                                .iter()
-                                .for_each(|simple_selector| {
-                                    items.extend(gen_selector_instruction(simple_selector))
-                                })
+                            items.extend(gen_compound_selector(compound_selector))
                         }),
                     raffia::ast::PseudoClassSelectorArg::Ident(ident) => {
                         items.extend(parse_interpolable_ident(ident))

@@ -68,10 +68,7 @@ fn gen_qualified_rule_instruction(node: QualifiedRule) -> PrintItems {
         sel.iter().map(|s| s.children.first().unwrap()).collect();
 
     for (i, complex_selector) in complex_selectors.iter().enumerate() {
-        let simple_selectors = &complex_selector.as_compound_selector().unwrap().children;
-        for (_, simple_selector) in simple_selectors.iter().enumerate() {
-            items.extend(gen_selector_instruction(simple_selector));
-        }
+        items.extend(gen_complex_selector_child(complex_selector));
         if i < complex_selectors.len() - 1 {
             items.push_str(",");
             items.push_signal(Signal::NewLine);
@@ -107,12 +104,13 @@ fn gen_complex_selector(complex_selector: &ComplexSelector) -> PrintItems {
 
 fn gen_complex_selector_child(complex_selector_child: &ComplexSelectorChild) -> PrintItems {
     let mut items = PrintItems::new();
-    complex_selector_child
-        .as_compound_selector()
-        .unwrap()
-        .children
-        .iter()
-        .for_each(|c| items.extend(gen_selector_instruction(c)));
+    match complex_selector_child {
+        ComplexSelectorChild::CompoundSelector(compound_selector) => compound_selector
+            .children
+            .iter()
+            .for_each(|c| items.extend(gen_selector_instruction(c))),
+        ComplexSelectorChild::Combinator(_) => todo!(),
+    }
     items
 }
 

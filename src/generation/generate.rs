@@ -111,13 +111,13 @@ fn gen_complex_selector_child(complex_selector_child: &ComplexSelectorChild) -> 
             .children
             .iter()
             .for_each(|simple_selector| items.extend(gen_selector_instruction(simple_selector))),
-        ComplexSelectorChild::Combinator(combinator) => match combinator.kind {
-            raffia::ast::CombinatorKind::Descendant => items.push_str(" "),
-            raffia::ast::CombinatorKind::NextSibling => todo!(),
-            raffia::ast::CombinatorKind::Child => todo!(),
-            raffia::ast::CombinatorKind::LaterSibling => todo!(),
-            raffia::ast::CombinatorKind::Column => todo!(),
-        },
+        ComplexSelectorChild::Combinator(combinator) => items.push_str(match combinator.kind {
+            raffia::ast::CombinatorKind::Descendant => " ",
+            raffia::ast::CombinatorKind::NextSibling => " + ",
+            raffia::ast::CombinatorKind::Child => " > ",
+            raffia::ast::CombinatorKind::LaterSibling => " ~ ",
+            raffia::ast::CombinatorKind::Column => "||",
+        }),
     }
     items
 }

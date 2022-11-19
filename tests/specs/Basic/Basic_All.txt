@@ -69,6 +69,10 @@ src:url("http://example.com/fonts/Lato-Regular.ttf")format("truetype");
         src:local();
 }
 
+div p,div>p,div+p,div~p,column-selector||cell-selector {
+  background-color: yellow;
+}
+
 [expect]
 body {
     margin: 0;
@@ -124,4 +128,12 @@ a[href*="cAsE" s] {
     src: url(/fonts/Lato-Regular.ttf) format("truetype");
     src: url("http://example.com/fonts/Lato-Regular.ttf") format("truetype");
     src: local();
+}
+
+div p,
+div > p,
+div + p,
+div ~ p,
+column-selector||cell-selector {
+    background-color: yellow;
 }

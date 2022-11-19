@@ -3,7 +3,7 @@ use dprint_core::formatting::*;
 use raffia::ast::{
     AtRule, Calc, ComplexSelector, ComplexSelectorChild, ComponentValue, Declaration, Delimiter,
     Dimension, Function, InterpolableIdent, InterpolableStr, Number, QualifiedRule, Ratio,
-    SimpleBlock, SimpleSelector, Url,
+    SelectorList, SimpleBlock, SimpleSelector, Url,
 };
 use raffia::token::TokenWithSpan;
 
@@ -63,20 +63,8 @@ fn gen_node(node: Node) -> PrintItems {
 
 fn gen_qualified_rule_instruction(node: QualifiedRule) -> PrintItems {
     let mut items = PrintItems::new();
-    let sel = &node.selector.selectors;
-    let complex_selectors: Vec<&ComplexSelectorChild> =
-        sel.iter().map(|s| s.children.first().unwrap()).collect();
-
-    for (i, complex_selector) in complex_selectors.iter().enumerate() {
-        items.extend(gen_complex_selector_child(complex_selector));
-        if i < complex_selectors.len() - 1 {
-            items.push_str(",");
-            items.push_signal(Signal::NewLine);
-        }
-    }
-
+    items.extend(gen_selector_list(&node.selector));
     items.extend(parse_simple_block(node.block));
-
     items
 }
 
@@ -93,12 +81,26 @@ fn gen_at_rule_instruction(node: AtRule) -> PrintItems {
     items
 }
 
+fn gen_selector_list(selector: &SelectorList) -> PrintItems {
+    let mut items = PrintItems::new();
+    for (i, complex_selector) in selector.selectors.iter().enumerate() {
+        items.extend(gen_complex_selector(complex_selector));
+        if i < selector.selectors.len() - 1 {
+            items.push_str(",");
+            items.push_signal(Signal::NewLine);
+        }
+    }
+    items
+}
+
 fn gen_complex_selector(complex_selector: &ComplexSelector) -> PrintItems {
     let mut items = PrintItems::new();
     complex_selector
         .children
         .iter()
-        .for_each(|c| items.extend(gen_complex_selector_child(c)));
+        .for_each(|complex_selector_child| {
+            items.extend(gen_complex_selector_child(complex_selector_child))
+        });
     items
 }
 
@@ -108,8 +110,14 @@ fn gen_complex_selector_child(complex_selector_child: &ComplexSelectorChild) -> 
         ComplexSelectorChild::CompoundSelector(compound_selector) => compound_selector
             .children
             .iter()
-            .for_each(|c| items.extend(gen_selector_instruction(c))),
-        ComplexSelectorChild::Combinator(_) => todo!(),
+            .for_each(|simple_selector| items.extend(gen_selector_instruction(simple_selector))),
+        ComplexSelectorChild::Combinator(combinator) => match combinator.kind {
+            raffia::ast::CombinatorKind::Descendant => items.push_str(" "),
+            raffia::ast::CombinatorKind::NextSibling => todo!(),
+            raffia::ast::CombinatorKind::Child => todo!(),
+            raffia::ast::CombinatorKind::LaterSibling => todo!(),
+            raffia::ast::CombinatorKind::Column => todo!(),
+        },
     }
     items
 }

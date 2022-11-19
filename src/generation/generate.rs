@@ -151,7 +151,20 @@ fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
             raffia::ast::TypeSelector::TagName(tag_name) => {
                 items.push_str(&tag_name.name.name.as_literal().unwrap().name);
             }
-            raffia::ast::TypeSelector::Universal(_) => items.push_str("*"),
+            raffia::ast::TypeSelector::Universal(universal) => {
+                if let Some(prefix) = &universal.prefix {
+                    if let Some(kind) = &prefix.kind {
+                        match kind {
+                            raffia::ast::NsPrefixKind::Ident(ident) => {
+                                items.extend(parse_interpolable_ident(ident))
+                            }
+                            raffia::ast::NsPrefixKind::Universal(_) => todo!(),
+                        }
+                        items.push_str("|");
+                    }
+                }
+                items.push_str("*");
+            }
         },
         SimpleSelector::Attribute(attribute) => {
             items.push_str("[");

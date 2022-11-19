@@ -427,7 +427,7 @@ fn parse_delimiter(delimiter: &Delimiter) -> PrintItems {
     let mut items = PrintItems::new();
     items.push_str(match delimiter.kind {
         raffia::ast::DelimiterKind::Comma => ",",
-        raffia::ast::DelimiterKind::Solidus => "\\",
+        raffia::ast::DelimiterKind::Solidus => " /",
         raffia::ast::DelimiterKind::Semicolon => ";",
     });
     items

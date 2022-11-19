@@ -18,6 +18,26 @@ table.colortable {
   &> .bar{ color: red; }
 }
 
+.error, #test {
+  &:hover > .baz { color: red; }
+}
+
+.foo {
+  &:is(.bar, &.baz) { color: red; }
+}
+
+figure {
+  margin: 0;
+
+  & > figcaption {
+    background: hsl(0 0% 0% / 50%);
+
+    & > p {
+      font-size: .9rem;
+    }
+  }
+}
+
 [expect]
 table.colortable {
     & td {
@@ -45,5 +65,30 @@ table.colortable {
 
     & > .bar {
         color: red;
+    }
+}
+
+.error,
+#test {
+    &:hover > .baz {
+        color: red;
+    }
+}
+
+.foo {
+    &:is(.bar, &.baz) {
+        color: red;
+    }
+}
+
+figure {
+    margin: 0;
+
+    & > figcaption {
+        background: hsl(0 0% 0% / 50%);
+
+        & > p {
+            font-size: 0.9rem;
+        }
     }
 }

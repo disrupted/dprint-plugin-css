@@ -75,6 +75,7 @@ div p,div>p,div+p,div~p,column-selector||cell-selector {
 dd:nth(4){
 border: 2px solid orange;
 }
+div.sidebar:has(*:nth-child(5)):not(:has(*:nth-child(6))) {}
 
 [expect]
 body {
@@ -144,3 +145,5 @@ column-selector||cell-selector {
 dd:nth(4) {
     border: 2px solid orange;
 }
+
+div.sidebar:has(*:nth-child(5)):not(:has(*:nth-child(6))) {}

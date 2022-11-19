@@ -1,9 +1,9 @@
 // use dprint_core::formatting::ir_helpers::gen_from_raw_string;
 use dprint_core::formatting::*;
 use raffia::ast::{
-    AtRule, Calc, ComplexSelector, ComplexSelectorChild, ComponentValue, Declaration, Delimiter,
-    Dimension, Function, InterpolableIdent, InterpolableStr, Number, QualifiedRule, Ratio,
-    SelectorList, SimpleBlock, SimpleSelector, Url,
+    AtRule, Calc, Combinator, ComplexSelector, ComplexSelectorChild, ComponentValue, Declaration,
+    Delimiter, Dimension, Function, InterpolableIdent, InterpolableStr, Number, QualifiedRule,
+    Ratio, SelectorList, SimpleBlock, SimpleSelector, Url,
 };
 use raffia::token::TokenWithSpan;
 
@@ -111,14 +111,20 @@ fn gen_complex_selector_child(complex_selector_child: &ComplexSelectorChild) -> 
             .children
             .iter()
             .for_each(|simple_selector| items.extend(gen_selector_instruction(simple_selector))),
-        ComplexSelectorChild::Combinator(combinator) => items.push_str(match combinator.kind {
-            raffia::ast::CombinatorKind::Descendant => " ",
-            raffia::ast::CombinatorKind::NextSibling => " + ",
-            raffia::ast::CombinatorKind::Child => " > ",
-            raffia::ast::CombinatorKind::LaterSibling => " ~ ",
-            raffia::ast::CombinatorKind::Column => "||",
-        }),
+        ComplexSelectorChild::Combinator(combinator) => items.extend(parse_combinator(combinator)),
     }
+    items
+}
+
+fn parse_combinator(combinator: &Combinator) -> PrintItems {
+    let mut items = PrintItems::new();
+    items.push_str(match combinator.kind {
+        raffia::ast::CombinatorKind::Descendant => " ",
+        raffia::ast::CombinatorKind::NextSibling => " + ",
+        raffia::ast::CombinatorKind::Child => " > ",
+        raffia::ast::CombinatorKind::LaterSibling => " ~ ",
+        raffia::ast::CombinatorKind::Column => "||",
+    });
     items
 }
 
@@ -210,7 +216,16 @@ fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
                         }
                     },
                     raffia::ast::PseudoClassSelectorArg::Number(_) => todo!(),
-                    raffia::ast::PseudoClassSelectorArg::RelativeSelectorList(_) => todo!(),
+                    raffia::ast::PseudoClassSelectorArg::RelativeSelectorList(
+                        relative_selector_list,
+                    ) => {
+                        for selector in relative_selector_list.selectors.iter() {
+                            items.extend(gen_complex_selector(&selector.complex_selector));
+                            if let Some(combinator) = &selector.combinator {
+                                items.extend(parse_combinator(combinator));
+                            }
+                        }
+                    }
                     raffia::ast::PseudoClassSelectorArg::SelectorList(selector_list) => {
                         selector_list
                             .selectors

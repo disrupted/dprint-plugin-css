@@ -354,14 +354,59 @@ fn parse_simple_block(block: SimpleBlock) -> PrintItems {
     items.push_signal(Signal::NewLine);
 
     // parse statements inside block
-    block.statements.into_iter().for_each(|statement| {
-        items.extend(ir_helpers::with_indent({
-            let mut items = PrintItems::new();
-            items.extend(gen_node(statement.into()));
-            items.push_signal(Signal::NewLine);
-            items
-        }));
-    });
+    let len = &block.statements.len();
+    let mut iter = block.statements.iter().peekable();
+    block
+        .statements
+        .iter()
+        .enumerate()
+        .for_each(|(i, statement)| {
+            items.extend(ir_helpers::with_indent({
+                let mut items = PrintItems::new();
+                let node: Node = statement.clone().into();
+                match node {
+                    Node::QualifiedRule(_) if i > 0 => items.push_signal(Signal::NewLine),
+                    _ => (),
+                }
+                items.extend(gen_node(node));
+                // items.push_signal(Signal::NewLine);
+                items
+            }));
+            if i < len - 1 {
+                items.push_signal(Signal::NewLine);
+            }
+            // if statement.is_qualified_rule() {
+            // if let Some(next_statement) = iter.peek() {
+            //     match next_statement {
+            //         // raffia::ast::Statement::QualifiedRule(_) => items.push_str("RULE"),
+            //         // raffia::ast::Statement::Declaration(_) => items.push_str("DECL"),
+            //         raffia::ast::Statement::QualifiedRule(_) => items.push_signal(Signal::NewLine),
+            //         _ => (),
+            //         // raffia::ast::Statement::AtRule(_) => todo!(),
+            //         // raffia::ast::Statement::KeyframeBlock(_) => todo!(),
+            //         // raffia::ast::Statement::LessVariableDeclaration(_) => todo!(),
+            //         // raffia::ast::Statement::SassContentAtRule(_) => todo!(),
+            //         // raffia::ast::Statement::SassDebugAtRule(_) => todo!(),
+            //         // raffia::ast::Statement::SassEachAtRule(_) => todo!(),
+            //         // raffia::ast::Statement::SassErrorAtRule(_) => todo!(),
+            //         // raffia::ast::Statement::SassExtendAtRule(_) => todo!(),
+            //         // raffia::ast::Statement::SassForAtRule(_) => todo!(),
+            //         // raffia::ast::Statement::SassForwardAtRule(_) => todo!(),
+            //         // raffia::ast::Statement::SassFunctionAtRule(_) => todo!(),
+            //         // raffia::ast::Statement::SassIfAtRule(_) => todo!(),
+            //         // raffia::ast::Statement::SassIncludeAtRule(_) => todo!(),
+            //         // raffia::ast::Statement::SassMixinAtRule(_) => todo!(),
+            //         // raffia::ast::Statement::SassReturnAtRule(_) => todo!(),
+            //         // raffia::ast::Statement::SassUseAtRule(_) => todo!(),
+            //         // raffia::ast::Statement::SassVariableDeclaration(_) => todo!(),
+            //         // raffia::ast::Statement::SassWarnAtRule(_) => todo!(),
+            //         // raffia::ast::Statement::SassWhileAtRule(_) => todo!(),
+            //     }
+            //     // items.push_signal(Signal::NewLine);
+            // }
+            // }
+        });
+    items.push_signal(Signal::NewLine);
     items.push_str("}");
 
     items

@@ -269,10 +269,10 @@ fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
                             }
                             items.push_str("n");
 
-                            if an_plus_b.b > 0 {
+                            if an_plus_b.b.is_positive() {
                                 items.push_str(" + ");
                                 items.push_str(&an_plus_b.b.to_string());
-                            } else if an_plus_b.b < 0 {
+                            } else if an_plus_b.b.is_negative() {
                                 items.push_str(" - ");
                                 items.push_str(&an_plus_b.b.abs().to_string());
                             }

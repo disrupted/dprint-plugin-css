@@ -209,13 +209,36 @@ fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
                     ) => compound_selector_list
                         .selectors
                         .iter()
-                        .for_each(|compound_selector| {
-                            items.extend(gen_compound_selector(compound_selector))
+                        .enumerate()
+                        .for_each(|(i, compound_selector)| {
+                            items.extend(gen_compound_selector(compound_selector));
+                            if i < compound_selector_list.selectors.len() - 1 {
+                                items.push_str(",");
+                                items.push_signal(Signal::SpaceOrNewLine);
+                            }
                         }),
+
                     raffia::ast::PseudoClassSelectorArg::Ident(ident) => {
                         items.extend(parse_interpolable_ident(ident))
                     }
-                    raffia::ast::PseudoClassSelectorArg::LanguageRangeList(_) => todo!(),
+                    raffia::ast::PseudoClassSelectorArg::LanguageRangeList(language_range_list) => {
+                        language_range_list.ranges.iter().enumerate().for_each(
+                            |(i, language_range)| {
+                                match language_range {
+                                    raffia::ast::LanguageRange::Str(str) => {
+                                        items.extend(parse_interpolable_str(str))
+                                    }
+                                    raffia::ast::LanguageRange::Ident(ident) => {
+                                        items.extend(parse_interpolable_ident(ident))
+                                    }
+                                }
+                                if i < language_range_list.ranges.len() - 1 {
+                                    items.push_str(",");
+                                    items.push_signal(Signal::SpaceOrNewLine);
+                                }
+                            },
+                        )
+                    }
                     raffia::ast::PseudoClassSelectorArg::Nth(nth) => match nth {
                         raffia::ast::Nth::Odd(odd) => items.push_str(&odd.name),
                         raffia::ast::Nth::Even(even) => items.push_str(&even.name),
@@ -372,7 +395,7 @@ fn parse_delimiter(delimiter: &Delimiter) -> PrintItems {
 
 fn parse_interpolable_ident(ident: &InterpolableIdent) -> PrintItems {
     let mut items = PrintItems::new();
-    items.push_str(&ident.as_literal().unwrap().name);
+    items.push_str(ident.as_literal().unwrap().raw);
     items
 }
 

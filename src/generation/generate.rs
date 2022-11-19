@@ -563,14 +563,40 @@ fn parse_url(url: &Url) -> PrintItems {
 
 fn parse_calc(calc: &Calc) -> PrintItems {
     let mut items = PrintItems::new();
+    let is_left_calc = calc.left.is_calc();
+    let is_right_calc = calc.right.is_calc();
+    let should_surround_left = is_left_calc
+        && !is_right_calc
+        && !matches!(
+            calc.left.as_calc().unwrap().op.kind,
+            raffia::ast::CalcOperatorKind::Multiply | raffia::ast::CalcOperatorKind::Division
+        );
+    if should_surround_left {
+        items.push_str("(");
+    }
     items.extend(parse_component_value(&calc.left));
+    if should_surround_left {
+        items.push_str(")");
+    }
     items.push_str(match calc.op.kind {
         raffia::ast::CalcOperatorKind::Plus => " + ",
         raffia::ast::CalcOperatorKind::Minus => " - ",
         raffia::ast::CalcOperatorKind::Multiply => " * ",
         raffia::ast::CalcOperatorKind::Division => " / ",
     });
+    let should_surround_right = !is_left_calc
+        && is_right_calc
+        && !matches!(
+            calc.right.as_calc().unwrap().op.kind,
+            raffia::ast::CalcOperatorKind::Multiply | raffia::ast::CalcOperatorKind::Division
+        );
+    if should_surround_right {
+        items.push_str("(");
+    }
     items.extend(parse_component_value(&calc.right));
+    if should_surround_right {
+        items.push_str(")");
+    }
     items
 }
 

@@ -275,10 +275,16 @@ fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
                             },
                         );
                     }
-                    raffia::ast::PseudoClassSelectorArg::TokenSeq(token_seq) => token_seq
-                        .tokens
-                        .iter()
-                        .for_each(|token| items.extend(parse_token_with_span(token))),
+                    raffia::ast::PseudoClassSelectorArg::TokenSeq(token_seq) => {
+                        token_seq.tokens.iter().enumerate().for_each(|(i, token)| {
+                            items.extend(parse_token_with_span(token));
+                            if let Some(next_token) = token_seq.tokens.get(i + 1) {
+                                if next_token.span.start > token.span.end {
+                                    items.push_signal(Signal::SpaceOrNewLine);
+                                }
+                            }
+                        })
+                    }
                 }
                 items.push_str(")");
             }

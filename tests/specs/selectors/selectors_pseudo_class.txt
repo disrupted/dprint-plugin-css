@@ -139,6 +139,37 @@ html:lang(de, fr) {}
 #container-div :-webkit-any(:link, :not(a)),
 h1:-webkit-any(.h1class, #bar) {}
 
+:current(p, li, dt, dd) {}
+:past(p, li, dt, dd) {}
+:future(p, li, dt, dd) {}
+
+:host(.special-custom-element) {}
+:host(   .special-custom-element   ) {}
+:host(.footer) {}
+:host {}
+:host-context(h1) {}
+:host-context(   h1   ) {}
+
+:unknown {}
+:unknown() {}
+:unknown(foo) {}
+:unknown(foo bar) {}
+:unknown(foo, bar) {}
+:unknown([foo]) {}
+:unknown((foo bar)) {}
+:unknown(((foo bar))) {}
+:unknown({foo: bar}) {}
+:unknown({{foo: bar}}) {}
+:unknown({foo: bar !important}) {}
+:unknown("string") {}
+:unknown("string", foo) {}
+:unknown('string') {}
+:unknown(url(foo.png)) {}
+:unknown({!}) {}
+:unknown(!) {}
+:unknown({;}) {}
+:unknown(;) {}
+
 [expect]
 :root {}
 
@@ -364,3 +395,59 @@ html:lang(de, fr) {}
 :-webkit-any(:link:focus),
 #container-div :-webkit-any(:link, :not(a)),
 h1:-webkit-any(.h1class, #bar) {}
+
+:current(p, li, dt, dd) {}
+
+:past(p, li, dt, dd) {}
+
+:future(p, li, dt, dd) {}
+
+:host(.special-custom-element) {}
+
+:host(.special-custom-element) {}
+
+:host(.footer) {}
+
+:host {}
+
+:host-context(h1) {}
+
+:host-context(h1) {}
+
+:unknown {}
+
+:unknown() {}
+
+:unknown(foo) {}
+
+:unknown(foo bar) {}
+
+:unknown(foo, bar) {}
+
+:unknown([foo]) {}
+
+:unknown((foo bar)) {}
+
+:unknown(((foo bar))) {}
+
+:unknown({foo: bar}) {}
+
+:unknown({{foo: bar}}) {}
+
+:unknown({foo: bar !important}) {}
+
+:unknown("string") {}
+
+:unknown("string", foo) {}
+
+:unknown('string') {}
+
+:unknown(url(foo.png)) {}
+
+:unknown({!}) {}
+
+:unknown(!) {}
+
+:unknown({;}) {}
+
+:unknown(;) {}

@@ -1,4 +1,4 @@
-== should format combined ==
+== should format pseudo class selectors ==
 
 :root {}
 :any-link {}

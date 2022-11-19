@@ -244,9 +244,21 @@ fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
                         raffia::ast::Nth::Even(even) => items.push_str(&even.name),
                         raffia::ast::Nth::Integer(int) => items.push_str(&int.value.to_string()),
                         raffia::ast::Nth::AnPlusB(an_plus_b) => {
-                            items.push_str(&an_plus_b.a.to_string());
-                            items.push_str(" + ");
-                            items.push_str(&an_plus_b.b.to_string());
+                            if an_plus_b.a.is_negative() {
+                                items.push_str("-");
+                            }
+                            if an_plus_b.a.abs() != 1 {
+                                items.push_str(&an_plus_b.a.abs().to_string());
+                            }
+                            items.push_str("n");
+
+                            if an_plus_b.b > 0 {
+                                items.push_str(" + ");
+                                items.push_str(&an_plus_b.b.to_string());
+                            } else if an_plus_b.b < 0 {
+                                items.push_str(" - ");
+                                items.push_str(&an_plus_b.b.abs().to_string());
+                            }
                         }
                     },
                     raffia::ast::PseudoClassSelectorArg::Number(_) => todo!(),

@@ -1,0 +1,39 @@
+== should format an + b selectors ==
+
+:nth-child(1n+0) {}
+:nth-child(n) {}
+:nth-child(n+0) {}
+:nth-child(-n+0) {}
+:nth-child(-n) {}
+:nth-child(N) {}
+:nth-child(+n+3) {}
+:nth-child(n+3) {}
+:nth-child( +n + 3 ) {}
+:nth-child(  N- 10) {}
+:nth-child(n-10) {}
+:nth-child(n- 10) {}
+
+[expect]
+:nth-child(n) {}
+
+:nth-child(n) {}
+
+:nth-child(n) {}
+
+:nth-child(-n) {}
+
+:nth-child(-n) {}
+
+:nth-child(n) {}
+
+:nth-child(n + 3) {}
+
+:nth-child(n + 3) {}
+
+:nth-child(n + 3) {}
+
+:nth-child(n - 10) {}
+
+:nth-child(n - 10) {}
+
+:nth-child(n - 10) {}

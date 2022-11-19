@@ -158,7 +158,7 @@ fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
                             raffia::ast::NsPrefixKind::Ident(ident) => {
                                 items.extend(parse_interpolable_ident(ident))
                             }
-                            raffia::ast::NsPrefixKind::Universal(_) => todo!(),
+                            raffia::ast::NsPrefixKind::Universal(_) => items.push_str("*"),
                         }
                         items.push_str("|");
                     }

@@ -172,6 +172,7 @@ fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
             items.push_str(":");
             items.push_str(&pseudo_class.name.as_literal().unwrap().name);
             if let Some(arg) = &pseudo_class.arg {
+                items.push_str("(");
                 match &arg {
                     raffia::ast::PseudoClassSelectorArg::CompoundSelector(compound_selector) => {
                         compound_selector
@@ -202,15 +203,17 @@ fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
                     raffia::ast::PseudoClassSelectorArg::Number(_) => todo!(),
                     raffia::ast::PseudoClassSelectorArg::RelativeSelectorList(_) => todo!(),
                     raffia::ast::PseudoClassSelectorArg::SelectorList(selector_list) => {
-                        items.push_str("(");
                         selector_list
                             .selectors
                             .iter()
                             .for_each(|c| items.extend(gen_complex_selector(c)));
-                        items.push_str(")");
                     }
-                    raffia::ast::PseudoClassSelectorArg::TokenSeq(_) => todo!(),
+                    raffia::ast::PseudoClassSelectorArg::TokenSeq(token_seq) => token_seq
+                        .tokens
+                        .iter()
+                        .for_each(|token| items.extend(parse_token_with_span(token))),
                 }
+                items.push_str(")");
             }
         }
         SimpleSelector::PseudoElement(pseudo_element) => {

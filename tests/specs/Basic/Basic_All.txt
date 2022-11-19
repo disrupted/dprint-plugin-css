@@ -72,6 +72,9 @@ src:url("http://example.com/fonts/Lato-Regular.ttf")format("truetype");
 div p,div>p,div+p,div~p,column-selector||cell-selector {
   background-color: yellow;
 }
+dd:nth(4){
+border: 2px solid orange;
+}
 
 [expect]
 body {
@@ -136,4 +139,8 @@ div + p,
 div ~ p,
 column-selector||cell-selector {
     background-color: yellow;
+}
+
+dd:nth(4) {
+    border: 2px solid orange;
 }

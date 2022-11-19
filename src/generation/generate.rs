@@ -85,11 +85,11 @@ fn gen_at_rule_instruction(node: AtRule) -> PrintItems {
 fn gen_selector_list(selector: &SelectorList) -> PrintItems {
     let mut items = PrintItems::new();
     for (i, complex_selector) in selector.selectors.iter().enumerate() {
-        items.extend(gen_complex_selector(complex_selector));
-        if i < selector.selectors.len() - 1 {
+        if i > 0 {
             items.push_str(",");
             items.push_signal(Signal::NewLine);
         }
+        items.extend(gen_complex_selector(complex_selector));
     }
     items
 }

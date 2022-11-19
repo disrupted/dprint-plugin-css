@@ -230,10 +230,14 @@ fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
                     raffia::ast::PseudoClassSelectorArg::RelativeSelectorList(
                         relative_selector_list,
                     ) => {
-                        for selector in relative_selector_list.selectors.iter() {
+                        for (i, selector) in relative_selector_list.selectors.iter().enumerate() {
                             items.extend(gen_complex_selector(&selector.complex_selector));
                             if let Some(combinator) = &selector.combinator {
                                 items.extend(parse_combinator(combinator));
+                            }
+                            if i < relative_selector_list.selectors.len() - 1 {
+                                items.push_str(",");
+                                items.push_signal(Signal::SpaceOrNewLine);
                             }
                         }
                     }

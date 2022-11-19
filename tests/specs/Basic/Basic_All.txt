@@ -77,6 +77,7 @@ border: 2px solid orange;
 }
 div.sidebar:has(*:nth-child(5)):not(:has(*:nth-child(6))) {}
 :not(em,strong#foo) {}
+section:not(:has(h1, h2, h3, h4, h5, h6)) {}
 html|*:not(:link):not(:visited) {}
 
 [expect]
@@ -151,5 +152,7 @@ dd:nth(4) {
 div.sidebar:has(*:nth-child(5)):not(:has(*:nth-child(6))) {}
 
 :not(em, strong#foo) {}
+
+section:not(:has(h1, h2, h3, h4, h5, h6)) {}
 
 html|*:not(:link):not(:visited) {}

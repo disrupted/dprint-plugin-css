@@ -361,11 +361,8 @@ fn parse_simple_block(block: SimpleBlock) -> PrintItems {
         .for_each(|(i, statement)| {
             items.extend(ir_helpers::with_indent({
                 let mut items = PrintItems::new();
-                match statement {
-                    raffia::ast::Statement::QualifiedRule(_) if i > 0 => {
-                        items.push_signal(Signal::NewLine)
-                    }
-                    _ => (),
+                if i > 0 && !statement.is_declaration() {
+                    items.push_signal(Signal::NewLine);
                 }
                 items.extend(gen_node(statement.into()));
                 items.push_signal(Signal::NewLine);

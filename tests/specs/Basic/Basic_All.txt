@@ -76,6 +76,7 @@ dd:nth(4){
 border: 2px solid orange;
 }
 div.sidebar:has(*:nth-child(5)):not(:has(*:nth-child(6))) {}
+:not(em,strong#foo) {}
 
 [expect]
 body {
@@ -147,3 +148,5 @@ dd:nth(4) {
 }
 
 div.sidebar:has(*:nth-child(5)):not(:has(*:nth-child(6))) {}
+
+:not(em, strong#foo) {}

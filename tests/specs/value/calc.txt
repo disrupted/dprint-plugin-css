@@ -4,6 +4,8 @@
 }
 
 div {
+  --width: calc(10% + 30px);
+
   width: calc(0px);
   line-height: calc(0);
   line-height: calc(2 + 3 * 4);
@@ -19,6 +21,7 @@ div {
 }
 
 div {
+    --width: calc(10% + 30px);
     width: calc(0px);
     line-height: calc(0);
     line-height: calc(2 + 3 * 4);

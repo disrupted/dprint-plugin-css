@@ -7,6 +7,7 @@ use raffia::ast::{
     SimpleSelector, Url, WqName,
 };
 use raffia::token::TokenWithSpan;
+use raffia::Spanned;
 
 use super::context::Context;
 use super::helpers::*;
@@ -376,7 +377,11 @@ fn parse_component_values(values: &[ComponentValue]) -> PrintItems {
     for (i, value) in values.iter().enumerate() {
         items.extend(parse_component_value(value));
         if let Some(next_node) = values.get(i + 1) {
-            if !next_node.is_delimiter() {
+            if let ComponentValue::TokenWithSpan(next_token) = next_node {
+                if next_token.span.start > value.span().end {
+                    items.push_signal(Signal::SpaceOrNewLine);
+                }
+            } else if !next_node.is_delimiter() {
                 items.push_signal(Signal::SpaceIfNotTrailing);
             }
         }

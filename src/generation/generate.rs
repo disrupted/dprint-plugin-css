@@ -376,14 +376,16 @@ fn parse_component_values(values: &[ComponentValue]) -> PrintItems {
     let mut items = PrintItems::new();
     for (i, value) in values.iter().enumerate() {
         items.extend(parse_component_value(value));
-        if let Some(next_node) = values.get(i + 1) {
-            if let ComponentValue::TokenWithSpan(next_token) = next_node {
+        let next_node = values.get(i + 1);
+        match next_node {
+            None => (),
+            Some(ComponentValue::Delimiter(_)) => (),
+            Some(ComponentValue::TokenWithSpan(next_token)) => {
                 if next_token.span.start > value.span().end {
-                    items.push_signal(Signal::SpaceOrNewLine);
+                    items.push_signal(Signal::SpaceOrNewLine)
                 }
-            } else if !next_node.is_delimiter() {
-                items.push_signal(Signal::SpaceIfNotTrailing);
             }
+            _ => items.push_signal(Signal::SpaceOrNewLine),
         }
     }
     items

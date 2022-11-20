@@ -378,8 +378,7 @@ fn parse_component_values(values: &[ComponentValue]) -> PrintItems {
         items.extend(parse_component_value(value));
         let next_node = values.get(i + 1);
         match next_node {
-            None => (),
-            Some(ComponentValue::Delimiter(_)) => (),
+            None | Some(ComponentValue::Delimiter(_)) => (),
             Some(ComponentValue::TokenWithSpan(next_token)) => {
                 if next_token.span.start > value.span().end {
                     items.push_signal(Signal::SpaceOrNewLine)

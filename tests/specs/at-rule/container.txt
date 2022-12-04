@@ -58,6 +58,18 @@
 @container name ((100px > width)) or (not ((100px > width))) { main { --match: true; } }
 @container name (100px >= width) {}
 @container name ((100px >= width)) or (not ((100px >= width))) { main { --match: true; } }
+@container name (100px < width < 200px) {}
+@container name ((100px < width < 200px)) or (not ((100px < width < 200px))) { main { --match:true; } }
+@container name (100px < width <= 200px) {}
+@container name ((100px < width <= 200px)) or (not ((100px < width <= 200px))) { main { --match:true; } }
+@container name (100px <= width < 200px) {}
+@container name ((100px <= width < 200px)) or (not ((100px <= width < 200px))) { main { --match:true; } }
+@container name (100px > width > 200px) {}
+@container name ((100px > width > 200px)) or (not ((100px > width > 200px))) { main { --match:true; } }
+@container name (100px > width >= 200px) {}
+@container name ((100px > width >= 200px)) or (not ((100px > width >= 200px))) { main { --match:true; } }
+@container name (100px >= width > 200px) {}
+@container name ((100px >= width > 200px)) or (not ((100px >= width > 200px))) { main { --match:true; } }
 
 [expect]
 @container name (width) {}
@@ -291,6 +303,54 @@
 @container name (100px >= width) {}
 
 @container name ((100px >= width)) or (not ((100px >= width))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name (100px < width < 200px) {}
+
+@container name ((100px < width < 200px)) or (not ((100px < width < 200px))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name (100px < width <= 200px) {}
+
+@container name ((100px < width <= 200px)) or (not ((100px < width <= 200px))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name (100px <= width < 200px) {}
+
+@container name ((100px <= width < 200px)) or (not ((100px <= width < 200px))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name (100px > width > 200px) {}
+
+@container name ((100px > width > 200px)) or (not ((100px > width > 200px))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name (100px > width >= 200px) {}
+
+@container name ((100px > width >= 200px)) or (not ((100px > width >= 200px))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name (100px >= width > 200px) {}
+
+@container name ((100px >= width > 200px)) or (not ((100px >= width > 200px))) {
     main {
         --match: true;
     }

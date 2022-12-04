@@ -227,7 +227,30 @@ fn parse_condition_query_in_parens(query: &QueryInParens) -> PrintItems {
                 });
                 items.extend(parse_component_value(&range.right));
             }
-            raffia::ast::MediaFeature::RangeInterval(_) => todo!(),
+            raffia::ast::MediaFeature::RangeInterval(range_interval) => {
+                items.extend(parse_component_value(&range_interval.left));
+                items.push_str(match range_interval.left_comparison.kind {
+                    raffia::ast::MediaFeatureComparisonKind::LessThan => " < ",
+                    raffia::ast::MediaFeatureComparisonKind::LessThanOrEqual => " <= ",
+                    raffia::ast::MediaFeatureComparisonKind::GreaterThan => " > ",
+                    raffia::ast::MediaFeatureComparisonKind::GreaterThanOrEqual => " >= ",
+                    raffia::ast::MediaFeatureComparisonKind::Equal => " = ",
+                });
+
+                match &range_interval.name {
+                    raffia::ast::MediaFeatureName::Ident(ident) => {
+                        items.extend(parse_interpolable_ident(ident))
+                    }
+                }
+                items.push_str(match range_interval.right_comparison.kind {
+                    raffia::ast::MediaFeatureComparisonKind::LessThan => " < ",
+                    raffia::ast::MediaFeatureComparisonKind::LessThanOrEqual => " <= ",
+                    raffia::ast::MediaFeatureComparisonKind::GreaterThan => " > ",
+                    raffia::ast::MediaFeatureComparisonKind::GreaterThanOrEqual => " >= ",
+                    raffia::ast::MediaFeatureComparisonKind::Equal => " = ",
+                });
+                items.extend(parse_component_value(&range_interval.right));
+            }
         },
         raffia::ast::QueryInParens::StyleQuery(_) => todo!(),
     }

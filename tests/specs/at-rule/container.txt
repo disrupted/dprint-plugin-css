@@ -1,6 +1,13 @@
 == should format at rule container ==
 
 @container name (width) {}
+@container name ((width)) or (not ((width))) { main { --match:true; } }
 
 [expect]
 @container name (width) {}
+
+@container name ((width)) or (not ((width))) {
+    main {
+        --match: true;
+    }
+}

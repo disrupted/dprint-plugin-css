@@ -406,14 +406,15 @@ fn parse_component_value(value: &ComponentValue) -> PrintItems {
         ComponentValue::InterpolableIdent(node) => items.extend(parse_interpolable_ident(node)),
         ComponentValue::InterpolableStr(node) => items.extend(parse_interpolable_str(node)),
         ComponentValue::LayerName(_) => todo!(),
-        ComponentValue::LessVariable(_) => todo!(),
-        ComponentValue::LessVariableVariable(_) => todo!(),
         ComponentValue::Number(node) => items.extend(parse_number(node)),
         ComponentValue::Percentage(node) => {
             items.push_str(&node.value.value.to_string());
             items.push_str("%");
         }
         ComponentValue::Ratio(node) => items.extend(parse_ratio(node)),
+        ComponentValue::TokenWithSpan(node) => items.extend(parse_token_with_span(node)),
+        ComponentValue::UnicodeRange(_) => todo!(),
+        ComponentValue::Url(node) => items.extend(parse_url(node)),
         ComponentValue::SassBinaryExpression(_) => todo!(),
         ComponentValue::SassMap(_) => todo!(),
         ComponentValue::SassNamespacedExpression(_) => todo!(),
@@ -422,9 +423,8 @@ fn parse_component_value(value: &ComponentValue) -> PrintItems {
         ComponentValue::SassParentSelector(_) => todo!(),
         ComponentValue::SassUnaryExpression(_) => todo!(),
         ComponentValue::SassVariable(_) => todo!(),
-        ComponentValue::TokenWithSpan(node) => items.extend(parse_token_with_span(node)),
-        ComponentValue::UnicodeRange(_) => todo!(),
-        ComponentValue::Url(node) => items.extend(parse_url(node)),
+        ComponentValue::LessVariable(_) => todo!(),
+        ComponentValue::LessVariableVariable(_) => todo!(),
     };
     items
 }
@@ -565,8 +565,8 @@ fn parse_url(url: &Url) -> PrintItems {
     if let Some(value) = &url.value {
         match value {
             raffia::ast::UrlValue::Raw(raw) => items.push_str(&raw.value),
-            raffia::ast::UrlValue::SassInterpolated(_) => todo!(),
             raffia::ast::UrlValue::Str(str) => items.extend(parse_interpolable_str(str)),
+            raffia::ast::UrlValue::SassInterpolated(_) => todo!(),
         }
     }
     items.push_str(")");

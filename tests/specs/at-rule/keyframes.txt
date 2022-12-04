@@ -1,0 +1,6 @@
+== should format at rule keyframes ==
+
+@keyframes foo {}
+
+[expect]
+@keyframes foo {}

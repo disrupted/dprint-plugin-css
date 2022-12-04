@@ -91,7 +91,12 @@ fn gen_at_rule_instruction(node: AtRule) -> PrintItems {
             raffia::ast::AtRulePrelude::FontFeatureValues(_) => todo!(),
             raffia::ast::AtRulePrelude::FontPaletteValues(_) => todo!(),
             raffia::ast::AtRulePrelude::Import(_) => todo!(),
-            raffia::ast::AtRulePrelude::Keyframes(_) => todo!(),
+            raffia::ast::AtRulePrelude::Keyframes(keyframes) => match keyframes {
+                raffia::ast::KeyframesName::Ident(ident) => {
+                    items.extend(parse_interpolable_ident(&ident))
+                }
+                raffia::ast::KeyframesName::Str(str) => items.extend(parse_interpolable_str(&str)),
+            },
             raffia::ast::AtRulePrelude::Layer(layer) => {
                 for (i, ident) in layer.idents.iter().enumerate() {
                     items.extend(parse_interpolable_ident(ident));

@@ -395,7 +395,11 @@ fn parse_component_values(values: &[ComponentValue]) -> PrintItems {
 fn parse_component_value(value: &ComponentValue) -> PrintItems {
     let mut items = PrintItems::new();
     match value {
-        ComponentValue::BracketBlock(_) => todo!(),
+        ComponentValue::BracketBlock(bracket_block) => {
+            items.push_str("[");
+            items.extend(parse_component_values(&bracket_block.value));
+            items.push_str("]");
+        }
         ComponentValue::Calc(node) => items.extend(parse_calc(node)),
         ComponentValue::Delimiter(node) => items.extend(parse_delimiter(node)),
         ComponentValue::Dimension(node) => items.extend(parse_dimension(node)),

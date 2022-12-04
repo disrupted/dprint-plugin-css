@@ -153,6 +153,47 @@
 @media (resolution: 1dppx), not all and (resolution: 1dppx) {}
 @media (resolution: 1x), not all and (resolution: 1x) {}
 
+@media all,badmedium {}
+@media badmedium,all {}
+@media all,(badexpression) {}
+@media (badexpression),all {}
+@media (badexpression),badmedium {}
+@media badmedium,(badexpression) {}
+
+@media not all and (bogus) {}
+@media only all and (bogus) {}
+@media (hover), not all and (hover) {}
+@media (hover: hover), not all and (hover: hover) {}
+@media (hover: none), not all and (hover: none) {}
+@media (any-hover), not all and (any-hover) {}
+@media (any-hover: hover), not all and (any-hover: hover) {}
+@media (any-hover: none), not all and (any-hover: none) {}
+
+@media (height) or (height) {}
+@media (width) or (height) {}
+@media (height) or (width) {}
+@media (height) or (width) or (height) {}
+
+@media ((height)) {}
+@media ((width)) {}
+@media (((((width))))) {}
+
+@media not (width) {}
+@media not (height) {}
+@media not ((width) and (height)) {}
+@media not ((width) or (height)) {}
+@media not ((width) and (not (height))) {}
+
+@MeDIa aLL and (Height) AnD (mIN-Width:0cM) aND (orienTAtion:LandScape) {}
+@MeDIa nOT All and (heiGHt) and (Min-widtH:0MM) and (Orientation:porTrait) {}
+
+@media (--FOO: bar) {}
+
+@media (min-width: calc(1px - 1px)) {}
+@media (min-width: calc(1em)) {}
+@media (min-width: calc(1px * 2 + 1rem)) {}
+@media (min-width: calc(1 * (2px + 1rem))) {}
+
 [expect]
 @media screen, (orientation) {}
 
@@ -442,3 +483,69 @@
 @media (resolution: 1dppx), not all and (resolution: 1dppx) {}
 
 @media (resolution: 1x), not all and (resolution: 1x) {}
+
+@media all, badmedium {}
+
+@media badmedium, all {}
+
+@media all, (badexpression) {}
+
+@media (badexpression), all {}
+
+@media (badexpression), badmedium {}
+
+@media badmedium, (badexpression) {}
+
+@media not all and (bogus) {}
+
+@media only all and (bogus) {}
+
+@media (hover), not all and (hover) {}
+
+@media (hover: hover), not all and (hover: hover) {}
+
+@media (hover: none), not all and (hover: none) {}
+
+@media (any-hover), not all and (any-hover) {}
+
+@media (any-hover: hover), not all and (any-hover: hover) {}
+
+@media (any-hover: none), not all and (any-hover: none) {}
+
+@media (height) or (height) {}
+
+@media (width) or (height) {}
+
+@media (height) or (width) {}
+
+@media (height) or (width) or (height) {}
+
+@media ((height)) {}
+
+@media ((width)) {}
+
+@media (((((width))))) {}
+
+@media not (width) {}
+
+@media not (height) {}
+
+@media not ((width) and (height)) {}
+
+@media not ((width) or (height)) {}
+
+@media not ((width) and (not (height))) {}
+
+@MeDIa aLL and (Height) and (mIN-Width: 0cM) and (orienTAtion: LandScape) {}
+
+@MeDIa nOT All and (heiGHt) and (Min-widtH: 0MM) and (Orientation: porTrait) {}
+
+@media (--FOO: bar) {}
+
+@media (min-width: calc(1px - 1px)) {}
+
+@media (min-width: calc(1em)) {}
+
+@media (min-width: calc(1px * 2 + 1rem)) {}
+
+@media (min-width: calc(1 * (2px + 1rem))) {}

@@ -2,9 +2,9 @@
 use dprint_core::formatting::*;
 use raffia::ast::{
     AtRule, Calc, Combinator, ComplexSelector, ComplexSelectorChild, ComponentValue,
-    CompoundSelector, Declaration, Delimiter, Dimension, Function, InterpolableIdent,
-    InterpolableStr, NsPrefix, Number, QualifiedRule, Ratio, SelectorList, SimpleBlock,
-    SimpleSelector, Url, WqName,
+    CompoundSelector, ContainerCondition, Declaration, Delimiter, Dimension, Function,
+    InterpolableIdent, InterpolableStr, NsPrefix, Number, QualifiedRule, Ratio, SelectorList,
+    SimpleBlock, SimpleSelector, Url, WqName,
 };
 use raffia::token::TokenWithSpan;
 use raffia::Spanned;
@@ -73,6 +73,44 @@ fn gen_at_rule_instruction(node: AtRule) -> PrintItems {
     items.push_str("@");
     items.push_str(&node.name.name);
 
+    if let Some(prelude) = node.prelude {
+        items.push_signal(Signal::SpaceOrNewLine);
+        match prelude {
+            raffia::ast::AtRulePrelude::Charset(_) => todo!(),
+            raffia::ast::AtRulePrelude::ColorProfile(_) => todo!(),
+            raffia::ast::AtRulePrelude::Container(container) => {
+                if let Some(name) = &container.name {
+                    items.extend(parse_interpolable_ident(name));
+                }
+                items.push_signal(Signal::SpaceOrNewLine);
+                items.push_str("(");
+                items.extend(parse_container_condition(&container.condition));
+                items.push_str(")");
+            }
+            raffia::ast::AtRulePrelude::CounterStyle(_) => todo!(),
+            raffia::ast::AtRulePrelude::CustomMedia(_) => todo!(),
+            raffia::ast::AtRulePrelude::Document(_) => todo!(),
+            raffia::ast::AtRulePrelude::FontFeatureValues(_) => todo!(),
+            raffia::ast::AtRulePrelude::FontPaletteValues(_) => todo!(),
+            raffia::ast::AtRulePrelude::Import(_) => todo!(),
+            raffia::ast::AtRulePrelude::Keyframes(_) => todo!(),
+            raffia::ast::AtRulePrelude::Layer(layer) => {
+                for ident in &layer.idents {
+                    items.extend(parse_interpolable_ident(ident));
+                }
+            }
+            raffia::ast::AtRulePrelude::Media(_) => todo!(),
+            raffia::ast::AtRulePrelude::Namespace(_) => todo!(),
+            raffia::ast::AtRulePrelude::Nest(_) => todo!(),
+            raffia::ast::AtRulePrelude::Page(_) => todo!(),
+            raffia::ast::AtRulePrelude::PositionFallback(_) => todo!(),
+            raffia::ast::AtRulePrelude::Property(_) => todo!(),
+            raffia::ast::AtRulePrelude::ScrollTimeline(_) => todo!(),
+            raffia::ast::AtRulePrelude::Supports(_) => todo!(),
+            raffia::ast::AtRulePrelude::Unknown(_) => todo!(),
+        }
+    }
+
     if let Some(block) = node.block {
         items.extend(parse_simple_block(block));
     }
@@ -120,6 +158,35 @@ fn gen_compound_selector(compound_selector: &CompoundSelector) -> PrintItems {
         .children
         .iter()
         .for_each(|simple_selector| items.extend(gen_selector_instruction(simple_selector)));
+    items
+}
+
+fn parse_container_condition(condition: &ContainerCondition) -> PrintItems {
+    let mut items = PrintItems::new();
+    for condition in condition.conditions.clone() {
+        match condition {
+            raffia::ast::ContainerConditionKind::QueryInParens(query) => match query {
+                raffia::ast::QueryInParens::ContainerCondition(nested_condition) => {
+                    items.extend(parse_container_condition(&nested_condition))
+                }
+                raffia::ast::QueryInParens::SizeFeature(size_feature) => match *size_feature {
+                    raffia::ast::MediaFeature::Plain(_) => todo!(),
+                    raffia::ast::MediaFeature::Boolean(bool) => match bool.name {
+                        raffia::ast::MediaFeatureName::Ident(ident) => {
+                            items.extend(parse_interpolable_ident(&ident))
+                        }
+                    },
+                    raffia::ast::MediaFeature::Range(_) => todo!(),
+                    raffia::ast::MediaFeature::RangeInterval(_) => todo!(),
+                },
+                raffia::ast::QueryInParens::StyleQuery(_) => todo!(),
+            },
+            raffia::ast::ContainerConditionKind::And(_) => todo!(),
+            raffia::ast::ContainerConditionKind::Or(_) => todo!(),
+            raffia::ast::ContainerConditionKind::Not(_) => todo!(),
+        }
+    }
+
     items
 }
 
@@ -414,7 +481,11 @@ fn parse_component_value(value: &ComponentValue) -> PrintItems {
         }
         ComponentValue::InterpolableIdent(node) => items.extend(parse_interpolable_ident(node)),
         ComponentValue::InterpolableStr(node) => items.extend(parse_interpolable_str(node)),
-        ComponentValue::LayerName(_) => todo!(),
+        ComponentValue::LayerName(layer_name) => {
+            for ident in &layer_name.idents {
+                items.extend(parse_interpolable_ident(ident));
+            }
+        }
         ComponentValue::Number(node) => items.extend(parse_number(node)),
         ComponentValue::Percentage(node) => {
             items.push_str(&node.value.value.to_string());

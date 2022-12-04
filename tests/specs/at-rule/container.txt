@@ -1,0 +1,6 @@
+== should format at rule container ==
+
+@container name (width) {}
+
+[expect]
+@container name (width) {}

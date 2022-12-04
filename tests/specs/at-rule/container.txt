@@ -1,8 +1,63 @@
 == should format at rule container ==
 
 @container name (width) {}
-@container name ((width)) or (not ((width))) { main { --match:true; } }
+@container name ((width)) or (not ((width))) { main { --match: true; } }
 @container name (min-width: 0px) {}
+@container name ((min-width: 0px)) or (not ((min-width: 0px))) { main { --match: true; } }
+@container name (max-width: 0px) {}
+@container name ((max-width: 0px)) or (not ((max-width: 0px))) { main { --match: true; } }
+@container name (aspect-ratio) {}
+@container name ((aspect-ratio)) or (not ((aspect-ratio))) { main { --match: true; } }
+@container name (min-aspect-ratio: 1/2) {}
+@container name ((min-aspect-ratio: 1/2)) or (not ((min-aspect-ratio: 1/2))) { main { --match: true; } }
+@container name (max-aspect-ratio: 1/2) {}
+@container name ((max-aspect-ratio: 1/2)) or (not ((max-aspect-ratio: 1/2))) { main { --match: true; } }
+@container name (orientation: portrait) {}
+@container name ((orientation: portrait)) or (not ((orientation: portrait))) { main { --match: true; } }
+@container name (inline-size) {}
+@container name ((inline-size)) or (not ((inline-size))) { main { --match: true; } }
+@container name (min-inline-size: 0px) {}
+@container name ((min-inline-size: 0px)) or (not ((min-inline-size: 0px))) { main { --match: true; } }
+@container name (max-inline-size: 0px) {}
+@container name ((max-inline-size: 0px)) or (not ((max-inline-size: 0px))) { main { --match: true; } }
+@container name (width: 100px) {}
+@container name ((width: 100px)) or (not ((width: 100px))) { main { --match: true; } }
+@container name ((width: 100px)) {}
+@container name (((width: 100px))) or (not (((width: 100px)))) { main { --match: true; } }
+@container name (not (width: 100px)) {}
+@container name ((not (width: 100px))) or (not ((not (width: 100px)))) { main { --match: true; } }
+@container name ((width: 100px) and (height: 100px)) {}
+@container name (((width: 100px) and (height: 100px))) or (not (((width: 100px) and (height: 100px)))) { main { --match: true; } }
+@container name (((width: 40px) or (width: 50px)) and (height: 100px)) {}
+@container name ((((width: 40px) or (width: 50px)) and (height: 100px))) or (not ((((width: 40px) or (width: 50px)) and (height: 100px)))) { main { --match: true; } }
+@container name ((width: 100px) and ((height: 40px) or (height: 50px))) {}
+@container name (((width: 100px) and ((height: 40px) or (height: 50px)))) or (not (((width: 100px) and ((height: 40px) or (height: 50px))))) { main { --match: true; } }
+@container name (((width: 40px) and (height: 50px)) or (height: 100px)) {}
+@container name ((((width: 40px) and (height: 50px)) or (height: 100px))) or (not ((((width: 40px) and (height: 50px)) or (height: 100px)))) { main { --match: true; } }
+@container name ((width: 50px) or ((width: 40px) and (height: 50px))) {}
+@container name (((width: 50px) or ((width: 40px) and (height: 50px)))) or (not (((width: 50px) or ((width: 40px) and (height: 50px))))) { main { --match: true; } }
+@container name ((width: 100px) and (not (height: 100px))) {}
+@container name (((width: 100px) and (not (height: 100px)))) or (not (((width: 100px) and (not (height: 100px))))) { main { --match: true; } }
+@container name (width < 100px) {}
+@container name ((width < 100px)) or (not ((width < 100px))) { main { --match: true; } }
+@container name (width <= 100px) {}
+@container name ((width <= 100px)) or (not ((width <= 100px))) { main { --match: true; } }
+@container name (width = 100px) {}
+@container name ((width = 100px)) or (not ((width = 100px))) { main { --match: true; } }
+@container name (width > 100px) {}
+@container name ((width > 100px)) or (not ((width > 100px))) { main { --match: true; } }
+@container name (width >= 100px) {}
+@container name ((width >= 100px)) or (not ((width >= 100px))) { main { --match: true; } }
+@container name (100px < width) {}
+@container name ((100px < width)) or (not ((100px < width))) { main { --match: true; } }
+@container name (100px <= width) {}
+@container name ((100px <= width)) or (not ((100px <= width))) { main { --match: true; } }
+@container name (100px = width) {}
+@container name ((100px = width)) or (not ((100px = width))) { main { --match: true; } }
+@container name (100px > width) {}
+@container name ((100px > width)) or (not ((100px > width))) { main { --match: true; } }
+@container name (100px >= width) {}
+@container name ((100px >= width)) or (not ((100px >= width))) { main { --match: true; } }
 
 [expect]
 @container name (width) {}
@@ -14,3 +69,229 @@
 }
 
 @container name (min-width: 0px) {}
+
+@container name ((min-width: 0px)) or (not ((min-width: 0px))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name (max-width: 0px) {}
+
+@container name ((max-width: 0px)) or (not ((max-width: 0px))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name (aspect-ratio) {}
+
+@container name ((aspect-ratio)) or (not ((aspect-ratio))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name (min-aspect-ratio: 1/2) {}
+
+@container name ((min-aspect-ratio: 1/2)) or (not ((min-aspect-ratio: 1/2))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name (max-aspect-ratio: 1/2) {}
+
+@container name ((max-aspect-ratio: 1/2)) or (not ((max-aspect-ratio: 1/2))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name (orientation: portrait) {}
+
+@container name ((orientation: portrait)) or (not ((orientation: portrait))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name (inline-size) {}
+
+@container name ((inline-size)) or (not ((inline-size))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name (min-inline-size: 0px) {}
+
+@container name ((min-inline-size: 0px)) or (not ((min-inline-size: 0px))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name (max-inline-size: 0px) {}
+
+@container name ((max-inline-size: 0px)) or (not ((max-inline-size: 0px))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name (width: 100px) {}
+
+@container name ((width: 100px)) or (not ((width: 100px))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name ((width: 100px)) {}
+
+@container name (((width: 100px))) or (not (((width: 100px)))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name (not (width: 100px)) {}
+
+@container name ((not (width: 100px))) or (not ((not (width: 100px)))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name ((width: 100px) and (height: 100px)) {}
+
+@container name (((width: 100px) and (height: 100px))) or (not (((width: 100px) and (height: 100px)))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name (((width: 40px) or (width: 50px)) and (height: 100px)) {}
+
+@container name
+((((width: 40px) or (width: 50px)) and (height: 100px))) or (not ((((width: 40px) or (width: 50px)) and (height: 100px)))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name ((width: 100px) and ((height: 40px) or (height: 50px))) {}
+
+@container name
+(((width: 100px) and ((height: 40px) or (height: 50px)))) or (not (((width: 100px) and ((height: 40px) or (height: 50px))))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name (((width: 40px) and (height: 50px)) or (height: 100px)) {}
+
+@container name
+((((width: 40px) and (height: 50px)) or (height: 100px))) or (not ((((width: 40px) and (height: 50px)) or (height: 100px)))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name ((width: 50px) or ((width: 40px) and (height: 50px))) {}
+
+@container name
+(((width: 50px) or ((width: 40px) and (height: 50px)))) or (not (((width: 50px) or ((width: 40px) and (height: 50px))))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name ((width: 100px) and (not (height: 100px))) {}
+
+@container name (((width: 100px) and (not (height: 100px)))) or (not (((width: 100px) and (not (height: 100px))))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name (width < 100px) {}
+
+@container name ((width < 100px)) or (not ((width < 100px))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name (width <= 100px) {}
+
+@container name ((width <= 100px)) or (not ((width <= 100px))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name (width = 100px) {}
+
+@container name ((width = 100px)) or (not ((width = 100px))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name (width > 100px) {}
+
+@container name ((width > 100px)) or (not ((width > 100px))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name (width >= 100px) {}
+
+@container name ((width >= 100px)) or (not ((width >= 100px))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name (100px < width) {}
+
+@container name ((100px < width)) or (not ((100px < width))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name (100px <= width) {}
+
+@container name ((100px <= width)) or (not ((100px <= width))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name (100px = width) {}
+
+@container name ((100px = width)) or (not ((100px = width))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name (100px > width) {}
+
+@container name ((100px > width)) or (not ((100px > width))) {
+    main {
+        --match: true;
+    }
+}
+
+@container name (100px >= width) {}
+
+@container name ((100px >= width)) or (not ((100px >= width))) {
+    main {
+        --match: true;
+    }
+}

@@ -3,8 +3,9 @@ use dprint_core::formatting::*;
 use raffia::ast::{
     AtRule, Calc, Combinator, ComplexSelector, ComplexSelectorChild, ComponentValue,
     CompoundSelector, ContainerCondition, Declaration, Delimiter, Dimension, Function,
-    InterpolableIdent, InterpolableStr, MediaFeatureComparisonKind, NsPrefix, Number,
-    QualifiedRule, QueryInParens, Ratio, SelectorList, SimpleBlock, SimpleSelector, Url, WqName,
+    InterpolableIdent, InterpolableStr, KeyframeBlock, MediaFeatureComparisonKind, NsPrefix,
+    Number, QualifiedRule, QueryInParens, Ratio, SelectorList, SimpleBlock, SimpleSelector, Url,
+    WqName,
 };
 use raffia::token::TokenWithSpan;
 use raffia::Spanned;
@@ -56,6 +57,7 @@ fn gen_node(node: Node) -> PrintItems {
         Node::QualifiedRule(node) => gen_qualified_rule_instruction(node),
         Node::Declaration(node) => gen_declaration_instruction(&node),
         Node::AtRule(node) => gen_at_rule_instruction(node),
+        Node::KeyframeBlock(node) => gen_keyframe_block(node),
     });
     items
 }
@@ -121,6 +123,27 @@ fn gen_at_rule_instruction(node: AtRule) -> PrintItems {
         items.extend(parse_simple_block(block));
     }
 
+    items
+}
+
+fn gen_keyframe_block(node: KeyframeBlock) -> PrintItems {
+    let mut items = PrintItems::new();
+    for (i, selector) in node.selectors.iter().enumerate() {
+        match selector {
+            raffia::ast::KeyframeSelector::Ident(ident) => {
+                items.extend(parse_interpolable_ident(ident))
+            }
+            raffia::ast::KeyframeSelector::Percentage(percentage) => {
+                items.push_string(percentage.value.value.to_string());
+                items.push_str("%");
+            }
+        }
+        if node.selectors.get(i + 1).is_some() {
+            items.push_str(",");
+            items.push_signal(Signal::SpaceIfNotTrailing);
+        }
+    }
+    items.extend(parse_simple_block(node.block));
     items
 }
 
@@ -392,27 +415,27 @@ fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
                     raffia::ast::PseudoClassSelectorArg::Nth(nth) => match nth {
                         raffia::ast::Nth::Odd(odd) => items.push_str(&odd.name),
                         raffia::ast::Nth::Even(even) => items.push_str(&even.name),
-                        raffia::ast::Nth::Integer(int) => items.push_str(&int.value.to_string()),
+                        raffia::ast::Nth::Integer(int) => items.push_string(int.value.to_string()),
                         raffia::ast::Nth::AnPlusB(an_plus_b) => {
                             if an_plus_b.a.is_negative() {
                                 items.push_str("-");
                             }
                             if an_plus_b.a.abs() != 1 {
-                                items.push_str(&an_plus_b.a.abs().to_string());
+                                items.push_string(an_plus_b.a.abs().to_string());
                             }
                             items.push_str("n");
 
                             if an_plus_b.b.is_positive() {
                                 items.push_str(" + ");
-                                items.push_str(&an_plus_b.b.to_string());
+                                items.push_string(an_plus_b.b.to_string());
                             } else if an_plus_b.b.is_negative() {
                                 items.push_str(" - ");
-                                items.push_str(&an_plus_b.b.abs().to_string());
+                                items.push_string(an_plus_b.b.abs().to_string());
                             }
                         }
                     },
                     raffia::ast::PseudoClassSelectorArg::Number(number) => {
-                        items.push_str(&number.value.to_string())
+                        items.push_string(number.value.to_string())
                     }
                     raffia::ast::PseudoClassSelectorArg::RelativeSelectorList(
                         relative_selector_list,
@@ -556,7 +579,7 @@ fn parse_component_value(value: &ComponentValue) -> PrintItems {
         }
         ComponentValue::Number(node) => items.extend(parse_number(node)),
         ComponentValue::Percentage(node) => {
-            items.push_str(&node.value.value.to_string());
+            items.push_string(node.value.value.to_string());
             items.push_str("%");
         }
         ComponentValue::Ratio(node) => items.extend(parse_ratio(node)),
@@ -605,7 +628,7 @@ fn parse_dimension(dimension: &Dimension) -> PrintItems {
     let mut items = PrintItems::new();
     match dimension {
         Dimension::Length(len) => {
-            items.push_str(&len.value.value.to_string());
+            items.push_string(len.value.value.to_string());
             items.push_str(&len.unit.name);
         }
         Dimension::Angle(_) => todo!(),
@@ -620,7 +643,7 @@ fn parse_dimension(dimension: &Dimension) -> PrintItems {
 
 fn parse_number(number: &Number) -> PrintItems {
     let mut items = PrintItems::new();
-    items.push_str(&number.value.to_string());
+    items.push_string(number.value.to_string());
     items
 }
 

@@ -1,36 +1,37 @@
-use raffia::ast::{AtRule, Declaration, QualifiedRule, Statement};
-
 #[derive(Clone)]
 pub enum Node<'a> {
-    Declaration(Declaration<'a>),
-    QualifiedRule(QualifiedRule<'a>),
-    AtRule(AtRule<'a>),
+    Declaration(raffia::ast::Declaration<'a>),
+    QualifiedRule(raffia::ast::QualifiedRule<'a>),
+    AtRule(raffia::ast::AtRule<'a>),
+    KeyframeBlock(raffia::ast::KeyframeBlock<'a>),
 }
 
-impl<'a> From<Statement<'a>> for Node<'a> {
-    fn from(rule: Statement<'a>) -> Node<'a> {
+impl<'a> From<raffia::ast::Statement<'a>> for Node<'a> {
+    fn from(rule: raffia::ast::Statement<'a>) -> Node<'a> {
         match rule {
-            Statement::AtRule(at_rule) => Node::AtRule(at_rule),
-            Statement::Declaration(declaration) => Node::Declaration(declaration),
-            Statement::KeyframeBlock(_) => todo!(),
-            Statement::LessVariableDeclaration(_) => todo!(),
-            Statement::QualifiedRule(rule) => Node::QualifiedRule(rule),
-            Statement::SassContentAtRule(_) => todo!(),
-            Statement::SassDebugAtRule(_) => todo!(),
-            Statement::SassEachAtRule(_) => todo!(),
-            Statement::SassErrorAtRule(_) => todo!(),
-            Statement::SassExtendAtRule(_) => todo!(),
-            Statement::SassForAtRule(_) => todo!(),
-            Statement::SassForwardAtRule(_) => todo!(),
-            Statement::SassFunctionAtRule(_) => todo!(),
-            Statement::SassIfAtRule(_) => todo!(),
-            Statement::SassIncludeAtRule(_) => todo!(),
-            Statement::SassMixinAtRule(_) => todo!(),
-            Statement::SassReturnAtRule(_) => todo!(),
-            Statement::SassUseAtRule(_) => todo!(),
-            Statement::SassVariableDeclaration(_) => todo!(),
-            Statement::SassWarnAtRule(_) => todo!(),
-            Statement::SassWhileAtRule(_) => todo!(),
+            raffia::ast::Statement::AtRule(at_rule) => Node::AtRule(at_rule),
+            raffia::ast::Statement::Declaration(declaration) => Node::Declaration(declaration),
+            raffia::ast::Statement::KeyframeBlock(keyframe_block) => {
+                Node::KeyframeBlock(keyframe_block)
+            }
+            raffia::ast::Statement::LessVariableDeclaration(_) => todo!(),
+            raffia::ast::Statement::QualifiedRule(rule) => Node::QualifiedRule(rule),
+            raffia::ast::Statement::SassContentAtRule(_) => todo!(),
+            raffia::ast::Statement::SassDebugAtRule(_) => todo!(),
+            raffia::ast::Statement::SassEachAtRule(_) => todo!(),
+            raffia::ast::Statement::SassErrorAtRule(_) => todo!(),
+            raffia::ast::Statement::SassExtendAtRule(_) => todo!(),
+            raffia::ast::Statement::SassForAtRule(_) => todo!(),
+            raffia::ast::Statement::SassForwardAtRule(_) => todo!(),
+            raffia::ast::Statement::SassFunctionAtRule(_) => todo!(),
+            raffia::ast::Statement::SassIfAtRule(_) => todo!(),
+            raffia::ast::Statement::SassIncludeAtRule(_) => todo!(),
+            raffia::ast::Statement::SassMixinAtRule(_) => todo!(),
+            raffia::ast::Statement::SassReturnAtRule(_) => todo!(),
+            raffia::ast::Statement::SassUseAtRule(_) => todo!(),
+            raffia::ast::Statement::SassVariableDeclaration(_) => todo!(),
+            raffia::ast::Statement::SassWarnAtRule(_) => todo!(),
+            raffia::ast::Statement::SassWhileAtRule(_) => todo!(),
         }
     }
 }

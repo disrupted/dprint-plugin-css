@@ -136,6 +136,23 @@
 @media (orientation), not all and (orientation) {}
 @media (orientation: portrait), not all and (orientation: portrait) {}
 
+@media (max-aspect-ratio: 1/1), not all and (max-aspect-ratio: 1/1) {}
+@media (max-aspect-ratio: 1  /1), not all and (max-aspect-ratio: 1  /1) {}
+@media (max-aspect-ratio: 1  /
+1), not all and (max-aspect-ratio: 1  /
+1) {}
+@media (max-aspect-ratio: 1/
+1), not all and (max-aspect-ratio: 1/
+1) {}
+@media (max-aspect-ratio: 1.0/1), not all and (max-aspect-ratio: 1.0/1) {}
+@media (max-aspect-ratio: 0/1), not all and (max-aspect-ratio: 0/1) {}
+@media (resolution: 3dpi), not all and (resolution: 3dpi) {}
+@media (resolution:3dpi), not all and (resolution:3dpi) {}
+@media (resolution: 3.0dpi), not all and (resolution: 3.0dpi) {}
+@media (resolution	: 120dpcm), not all and (resolution	: 120dpcm) {}
+@media (resolution: 1dppx), not all and (resolution: 1dppx) {}
+@media (resolution: 1x), not all and (resolution: 1x) {}
+
 [expect]
 @media screen, (orientation) {}
 
@@ -401,3 +418,27 @@
 @media (orientation), not all and (orientation) {}
 
 @media (orientation: portrait), not all and (orientation: portrait) {}
+
+@media (max-aspect-ratio: 1/1), not all and (max-aspect-ratio: 1/1) {}
+
+@media (max-aspect-ratio: 1/1), not all and (max-aspect-ratio: 1/1) {}
+
+@media (max-aspect-ratio: 1/1), not all and (max-aspect-ratio: 1/1) {}
+
+@media (max-aspect-ratio: 1/1), not all and (max-aspect-ratio: 1/1) {}
+
+@media (max-aspect-ratio: 1/1), not all and (max-aspect-ratio: 1/1) {}
+
+@media (max-aspect-ratio: 0/1), not all and (max-aspect-ratio: 0/1) {}
+
+@media (resolution: 3dpi), not all and (resolution: 3dpi) {}
+
+@media (resolution: 3dpi), not all and (resolution: 3dpi) {}
+
+@media (resolution: 3dpi), not all and (resolution: 3dpi) {}
+
+@media (resolution: 120dpcm), not all and (resolution: 120dpcm) {}
+
+@media (resolution: 1dppx), not all and (resolution: 1dppx) {}
+
+@media (resolution: 1x), not all and (resolution: 1x) {}

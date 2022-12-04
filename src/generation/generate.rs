@@ -141,7 +141,11 @@ fn gen_at_rule_instruction(node: AtRule) -> PrintItems {
             raffia::ast::AtRulePrelude::Property(_) => todo!(),
             raffia::ast::AtRulePrelude::ScrollTimeline(_) => todo!(),
             raffia::ast::AtRulePrelude::Supports(_) => todo!(),
-            raffia::ast::AtRulePrelude::Unknown(_) => todo!(),
+            raffia::ast::AtRulePrelude::Unknown(unknown) => {
+                for token in unknown.tokens {
+                    items.extend(parse_token_with_span(&token));
+                }
+            }
         }
     }
 
@@ -713,9 +717,15 @@ fn parse_dimension(dimension: &Dimension) -> PrintItems {
         Dimension::Angle(_) => todo!(),
         Dimension::Duration(_) => todo!(),
         Dimension::Frequency(_) => todo!(),
-        Dimension::Resolution(_) => todo!(),
+        Dimension::Resolution(resolution) => {
+            items.push_string(resolution.value.value.to_string());
+            items.push_str(&resolution.unit.name);
+        }
         Dimension::Flex(_) => todo!(),
-        Dimension::Unknown(_) => todo!(),
+        Dimension::Unknown(unknown) => {
+            items.push_string(unknown.value.value.to_string());
+            items.push_str(&unknown.unit.name);
+        }
     }
     items
 }

@@ -3,8 +3,8 @@ use dprint_core::formatting::*;
 use raffia::ast::{
     AtRule, Calc, Combinator, ComplexSelector, ComplexSelectorChild, ComponentValue,
     CompoundSelector, ContainerCondition, Declaration, Delimiter, Dimension, Function,
-    InterpolableIdent, InterpolableStr, NsPrefix, Number, QualifiedRule, QueryInParens, Ratio,
-    SelectorList, SimpleBlock, SimpleSelector, Url, WqName,
+    InterpolableIdent, InterpolableStr, MediaFeatureComparisonKind, NsPrefix, Number,
+    QualifiedRule, QueryInParens, Ratio, SelectorList, SimpleBlock, SimpleSelector, Url, WqName,
 };
 use raffia::token::TokenWithSpan;
 use raffia::Spanned;
@@ -218,37 +218,22 @@ fn parse_condition_query_in_parens(query: &QueryInParens) -> PrintItems {
             },
             raffia::ast::MediaFeature::Range(range) => {
                 items.extend(parse_component_value(&range.left));
-                items.push_str(match range.comparison.kind {
-                    raffia::ast::MediaFeatureComparisonKind::LessThan => " < ",
-                    raffia::ast::MediaFeatureComparisonKind::LessThanOrEqual => " <= ",
-                    raffia::ast::MediaFeatureComparisonKind::GreaterThan => " > ",
-                    raffia::ast::MediaFeatureComparisonKind::GreaterThanOrEqual => " >= ",
-                    raffia::ast::MediaFeatureComparisonKind::Equal => " = ",
-                });
+                items.push_str(parse_media_feature_kind(&range.comparison.kind));
                 items.extend(parse_component_value(&range.right));
             }
             raffia::ast::MediaFeature::RangeInterval(range_interval) => {
                 items.extend(parse_component_value(&range_interval.left));
-                items.push_str(match range_interval.left_comparison.kind {
-                    raffia::ast::MediaFeatureComparisonKind::LessThan => " < ",
-                    raffia::ast::MediaFeatureComparisonKind::LessThanOrEqual => " <= ",
-                    raffia::ast::MediaFeatureComparisonKind::GreaterThan => " > ",
-                    raffia::ast::MediaFeatureComparisonKind::GreaterThanOrEqual => " >= ",
-                    raffia::ast::MediaFeatureComparisonKind::Equal => " = ",
-                });
-
+                items.push_str(parse_media_feature_kind(
+                    &range_interval.left_comparison.kind,
+                ));
                 match &range_interval.name {
                     raffia::ast::MediaFeatureName::Ident(ident) => {
                         items.extend(parse_interpolable_ident(ident))
                     }
                 }
-                items.push_str(match range_interval.right_comparison.kind {
-                    raffia::ast::MediaFeatureComparisonKind::LessThan => " < ",
-                    raffia::ast::MediaFeatureComparisonKind::LessThanOrEqual => " <= ",
-                    raffia::ast::MediaFeatureComparisonKind::GreaterThan => " > ",
-                    raffia::ast::MediaFeatureComparisonKind::GreaterThanOrEqual => " >= ",
-                    raffia::ast::MediaFeatureComparisonKind::Equal => " = ",
-                });
+                items.push_str(parse_media_feature_kind(
+                    &range_interval.right_comparison.kind,
+                ));
                 items.extend(parse_component_value(&range_interval.right));
             }
         },
@@ -256,6 +241,16 @@ fn parse_condition_query_in_parens(query: &QueryInParens) -> PrintItems {
     }
     items.push_str(")");
     items
+}
+
+fn parse_media_feature_kind(media_feature_kind: &MediaFeatureComparisonKind) -> &str {
+    match media_feature_kind {
+        raffia::ast::MediaFeatureComparisonKind::LessThan => " < ",
+        raffia::ast::MediaFeatureComparisonKind::LessThanOrEqual => " <= ",
+        raffia::ast::MediaFeatureComparisonKind::GreaterThan => " > ",
+        raffia::ast::MediaFeatureComparisonKind::GreaterThanOrEqual => " >= ",
+        raffia::ast::MediaFeatureComparisonKind::Equal => " = ",
+    }
 }
 
 fn parse_combinator(combinator: &Combinator) -> PrintItems {

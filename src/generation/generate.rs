@@ -268,14 +268,7 @@ fn parse_media_conditions(conditions: &[MediaConditionKind]) -> PrintItems {
     for condition in conditions {
         match condition {
             raffia::ast::MediaConditionKind::MediaInParens(media_in_parens) => {
-                match media_in_parens {
-                    raffia::ast::MediaInParens::MediaCondition(media_condition) => {
-                        items.extend(parse_media_conditions(&media_condition.conditions))
-                    }
-                    raffia::ast::MediaInParens::MediaFeature(media_feature) => {
-                        items.extend(parse_media_feature(media_feature))
-                    }
-                }
+                items.extend(parse_media_in_parens(media_in_parens));
             }
             raffia::ast::MediaConditionKind::And(and) => {
                 items.push_str("and");

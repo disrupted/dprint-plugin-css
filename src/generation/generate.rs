@@ -265,7 +265,10 @@ fn parse_condition_query_in_parens(query: &QueryInParens) -> PrintItems {
 
 fn parse_media_conditions(conditions: &[MediaConditionKind]) -> PrintItems {
     let mut items = PrintItems::new();
-    for condition in conditions {
+    for (i, condition) in conditions.iter().enumerate() {
+        if i > 0 {
+            items.push_signal(Signal::SpaceIfNotTrailing);
+        }
         match condition {
             raffia::ast::MediaConditionKind::MediaInParens(media_in_parens) => {
                 items.extend(parse_media_in_parens(media_in_parens));

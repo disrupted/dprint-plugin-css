@@ -95,8 +95,11 @@ fn gen_at_rule_instruction(node: AtRule) -> PrintItems {
             raffia::ast::AtRulePrelude::Import(_) => todo!(),
             raffia::ast::AtRulePrelude::Keyframes(_) => todo!(),
             raffia::ast::AtRulePrelude::Layer(layer) => {
-                for ident in &layer.idents {
+                for (i, ident) in layer.idents.iter().enumerate() {
                     items.extend(parse_interpolable_ident(ident));
+                    if layer.idents.get(i + 1).is_some() {
+                        items.push_str(".");
+                    }
                 }
             }
             raffia::ast::AtRulePrelude::Media(_) => todo!(),

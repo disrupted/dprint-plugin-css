@@ -1,0 +1,11 @@
+== should format at rule media query ==
+@media screen, (orientation) {}
+@media screen, not (orientation) {}
+@media ((orientation)), not all and ((orientation)) {}
+
+[expect]
+@media screen, (orientation) {}
+
+@media screen, not (orientation) {}
+
+@media ((orientation)), not all and ((orientation)) {}

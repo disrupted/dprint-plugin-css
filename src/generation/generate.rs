@@ -3,9 +3,9 @@ use dprint_core::formatting::*;
 use raffia::ast::{
     AtRule, Calc, Combinator, ComplexSelector, ComplexSelectorChild, ComponentValue,
     CompoundSelector, ContainerCondition, Declaration, Delimiter, Dimension, Function,
-    InterpolableIdent, InterpolableStr, KeyframeBlock, MediaFeatureComparisonKind, NsPrefix,
-    Number, QualifiedRule, QueryInParens, Ratio, SelectorList, SimpleBlock, SimpleSelector, Url,
-    WqName,
+    InterpolableIdent, InterpolableStr, KeyframeBlock, MediaConditionKind, MediaFeature,
+    MediaFeatureComparisonKind, MediaInParens, NsPrefix, Number, QualifiedRule, QueryInParens,
+    Ratio, SelectorList, SimpleBlock, SimpleSelector, Url, WqName,
 };
 use raffia::token::TokenWithSpan;
 use raffia::Spanned;
@@ -107,7 +107,33 @@ fn gen_at_rule_instruction(node: AtRule) -> PrintItems {
                     }
                 }
             }
-            raffia::ast::AtRulePrelude::Media(_) => todo!(),
+            raffia::ast::AtRulePrelude::Media(media) => {
+                for (i, query) in media.queries.iter().enumerate() {
+                    if i > 0 {
+                        items.push_str(",");
+                        items.push_signal(Signal::SpaceIfNotTrailing);
+                    }
+                    match query {
+                        raffia::ast::MediaQuery::ConditionOnly(query_condition_only) => {
+                            items.extend(parse_media_conditions(&query_condition_only.conditions))
+                        }
+                        raffia::ast::MediaQuery::WithType(query_with_type) => {
+                            if let Some(modifier) = &query_with_type.modifier {
+                                items.push_str(&modifier.name);
+                                items.push_signal(Signal::SpaceIfNotTrailing);
+                            }
+
+                            items.extend(parse_interpolable_ident(&query_with_type.media_type));
+                            if let Some(condition) = &query_with_type.condition {
+                                items.push_signal(Signal::SpaceIfNotTrailing);
+                                items.push_str("and");
+                                items.push_signal(Signal::SpaceIfNotTrailing);
+                                items.extend(parse_media_conditions(&condition.conditions));
+                            }
+                        }
+                    }
+                }
+            }
             raffia::ast::AtRulePrelude::Namespace(_) => todo!(),
             raffia::ast::AtRulePrelude::Nest(_) => todo!(),
             raffia::ast::AtRulePrelude::Page(_) => todo!(),
@@ -228,46 +254,103 @@ fn parse_condition_query_in_parens(query: &QueryInParens) -> PrintItems {
         raffia::ast::QueryInParens::ContainerCondition(nested_condition) => {
             items.extend(parse_container_condition(&nested_condition))
         }
-        raffia::ast::QueryInParens::SizeFeature(size_feature) => match *size_feature {
-            raffia::ast::MediaFeature::Plain(plain) => {
-                match &plain.name {
-                    raffia::ast::MediaFeatureName::Ident(ident) => {
-                        items.extend(parse_interpolable_ident(ident))
-                    }
-                };
-                items.push_str(":");
-                items.push_signal(Signal::SpaceIfNotTrailing);
-                items.extend(parse_component_value(&plain.value));
-            }
-            raffia::ast::MediaFeature::Boolean(bool) => match bool.name {
-                raffia::ast::MediaFeatureName::Ident(ident) => {
-                    items.extend(parse_interpolable_ident(&ident))
-                }
-            },
-            raffia::ast::MediaFeature::Range(range) => {
-                items.extend(parse_component_value(&range.left));
-                items.push_str(parse_media_feature_kind(&range.comparison.kind));
-                items.extend(parse_component_value(&range.right));
-            }
-            raffia::ast::MediaFeature::RangeInterval(range_interval) => {
-                items.extend(parse_component_value(&range_interval.left));
-                items.push_str(parse_media_feature_kind(
-                    &range_interval.left_comparison.kind,
-                ));
-                match &range_interval.name {
-                    raffia::ast::MediaFeatureName::Ident(ident) => {
-                        items.extend(parse_interpolable_ident(ident))
-                    }
-                }
-                items.push_str(parse_media_feature_kind(
-                    &range_interval.right_comparison.kind,
-                ));
-                items.extend(parse_component_value(&range_interval.right));
-            }
-        },
+        raffia::ast::QueryInParens::SizeFeature(size_feature) => {
+            items.extend(parse_media_feature(&size_feature))
+        }
         raffia::ast::QueryInParens::StyleQuery(_) => todo!(),
     }
     items.push_str(")");
+    items
+}
+
+fn parse_media_conditions(conditions: &[MediaConditionKind]) -> PrintItems {
+    let mut items = PrintItems::new();
+    for condition in conditions {
+        match condition {
+            raffia::ast::MediaConditionKind::MediaInParens(media_in_parens) => {
+                match media_in_parens {
+                    raffia::ast::MediaInParens::MediaCondition(media_condition) => {
+                        items.extend(parse_media_conditions(&media_condition.conditions))
+                    }
+                    raffia::ast::MediaInParens::MediaFeature(media_feature) => {
+                        items.extend(parse_media_feature(media_feature))
+                    }
+                }
+            }
+            raffia::ast::MediaConditionKind::And(and) => {
+                items.push_str("and");
+                items.push_signal(Signal::SpaceIfNotTrailing);
+                items.extend(parse_media_in_parens(&and.media_in_parens));
+            }
+            raffia::ast::MediaConditionKind::Or(or) => {
+                items.push_str("or");
+                items.push_signal(Signal::SpaceIfNotTrailing);
+                items.extend(parse_media_in_parens(&or.media_in_parens));
+            }
+            raffia::ast::MediaConditionKind::Not(not) => {
+                items.push_str("not");
+                items.push_signal(Signal::SpaceIfNotTrailing);
+                items.extend(parse_media_in_parens(&not.media_in_parens));
+            }
+        }
+    }
+    items
+}
+
+fn parse_media_in_parens(media: &MediaInParens) -> PrintItems {
+    let mut items = PrintItems::new();
+    items.push_str("(");
+    match media.clone() {
+        MediaInParens::MediaCondition(media_condition) => {
+            items.extend(parse_media_conditions(&media_condition.conditions))
+        }
+        MediaInParens::MediaFeature(media_feature) => {
+            items.extend(parse_media_feature(&media_feature))
+        }
+    }
+    items.push_str(")");
+    items
+}
+
+fn parse_media_feature(media_feature: &MediaFeature) -> PrintItems {
+    let mut items = PrintItems::new();
+    match media_feature {
+        raffia::ast::MediaFeature::Plain(plain) => {
+            match &plain.name {
+                raffia::ast::MediaFeatureName::Ident(ident) => {
+                    items.extend(parse_interpolable_ident(ident))
+                }
+            };
+            items.push_str(":");
+            items.push_signal(Signal::SpaceIfNotTrailing);
+            items.extend(parse_component_value(&plain.value));
+        }
+        raffia::ast::MediaFeature::Boolean(bool) => match &bool.name {
+            raffia::ast::MediaFeatureName::Ident(ident) => {
+                items.extend(parse_interpolable_ident(ident))
+            }
+        },
+        raffia::ast::MediaFeature::Range(range) => {
+            items.extend(parse_component_value(&range.left));
+            items.push_str(parse_media_feature_kind(&range.comparison.kind));
+            items.extend(parse_component_value(&range.right));
+        }
+        raffia::ast::MediaFeature::RangeInterval(range_interval) => {
+            items.extend(parse_component_value(&range_interval.left));
+            items.push_str(parse_media_feature_kind(
+                &range_interval.left_comparison.kind,
+            ));
+            match &range_interval.name {
+                raffia::ast::MediaFeatureName::Ident(ident) => {
+                    items.extend(parse_interpolable_ident(ident))
+                }
+            }
+            items.push_str(parse_media_feature_kind(
+                &range_interval.right_comparison.kind,
+            ));
+            items.extend(parse_component_value(&range_interval.right));
+        }
+    }
     items
 }
 

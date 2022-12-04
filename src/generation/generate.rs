@@ -201,7 +201,16 @@ fn parse_condition_query_in_parens(query: &QueryInParens) -> PrintItems {
             items.extend(parse_container_condition(&nested_condition))
         }
         raffia::ast::QueryInParens::SizeFeature(size_feature) => match *size_feature {
-            raffia::ast::MediaFeature::Plain(_) => todo!(),
+            raffia::ast::MediaFeature::Plain(plain) => {
+                match &plain.name {
+                    raffia::ast::MediaFeatureName::Ident(ident) => {
+                        items.extend(parse_interpolable_ident(ident))
+                    }
+                };
+                items.push_str(":");
+                items.push_signal(Signal::SpaceIfNotTrailing);
+                items.extend(parse_component_value(&plain.value));
+            }
             raffia::ast::MediaFeature::Boolean(bool) => match bool.name {
                 raffia::ast::MediaFeatureName::Ident(ident) => {
                     items.extend(parse_interpolable_ident(&ident))

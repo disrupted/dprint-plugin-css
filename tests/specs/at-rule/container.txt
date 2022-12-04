@@ -2,6 +2,7 @@
 
 @container name (width) {}
 @container name ((width)) or (not ((width))) { main { --match:true; } }
+@container name (min-width: 0px) {}
 
 [expect]
 @container name (width) {}
@@ -11,3 +12,5 @@
         --match: true;
     }
 }
+
+@container name (min-width: 0px) {}

@@ -168,7 +168,7 @@ fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
         }
         SimpleSelector::Id(id) => {
             items.push_str("#");
-            items.push_str(&id.name.as_literal().unwrap().name);
+            items.extend(parse_interpolable_ident(&id.name));
         }
         SimpleSelector::Type(typ) => match typ {
             raffia::ast::TypeSelector::TagName(tag_name) => {
@@ -276,7 +276,9 @@ fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
                             }
                         }
                     },
-                    raffia::ast::PseudoClassSelectorArg::Number(_) => todo!(),
+                    raffia::ast::PseudoClassSelectorArg::Number(number) => {
+                        items.push_str(&number.value.to_string())
+                    }
                     raffia::ast::PseudoClassSelectorArg::RelativeSelectorList(
                         relative_selector_list,
                     ) => {
@@ -402,7 +404,10 @@ fn parse_component_value(value: &ComponentValue) -> PrintItems {
             items.push_str("#");
             items.push_str(&node.value);
         }
-        ComponentValue::IdSelector(_) => todo!(),
+        ComponentValue::IdSelector(id_selector) => {
+            items.push_str("#");
+            items.extend(parse_interpolable_ident(&id_selector.name));
+        }
         ComponentValue::InterpolableIdent(node) => items.extend(parse_interpolable_ident(node)),
         ComponentValue::InterpolableStr(node) => items.extend(parse_interpolable_str(node)),
         ComponentValue::LayerName(_) => todo!(),
@@ -490,30 +495,33 @@ fn parse_function(function: &Function) -> PrintItems {
 fn parse_token_with_span(node: &TokenWithSpan) -> PrintItems {
     let mut items = PrintItems::new();
     match &node.token {
-        raffia::token::Token::Eof(_) => todo!(),
+        raffia::token::Token::Eof(_) => items.push_str("<eof>"),
         raffia::token::Token::Ampersand(_) => items.push_str("&"),
         raffia::token::Token::Asterisk(_) => items.push_str("*"),
         raffia::token::Token::AsteriskEqual(_) => items.push_str("*="),
         raffia::token::Token::At(_) => items.push_str("@"),
-        raffia::token::Token::AtKeyword(_) => todo!(),
-        raffia::token::Token::AtLBraceVar(_) => todo!(),
-        raffia::token::Token::BadStr(_) => todo!(),
+        raffia::token::Token::AtKeyword(_) => items.push_str("<at-keyword>"),
+        raffia::token::Token::AtLBraceVar(_) => items.push_str("@{"),
+        raffia::token::Token::BadStr(_) => items.push_str("<bad string>"),
         raffia::token::Token::Bar(_) => items.push_str("|"),
         raffia::token::Token::BarBar(_) => items.push_str("||"),
         raffia::token::Token::BarEqual(_) => items.push_str("|="),
         raffia::token::Token::CaretEqual(_) => items.push_str("^="),
-        raffia::token::Token::Cdc(_) => todo!(),
-        raffia::token::Token::Cdo(_) => todo!(),
+        raffia::token::Token::Cdc(_) => items.push_str("<CDC>"),
+        raffia::token::Token::Cdo(_) => items.push_str("<CDO>"),
         raffia::token::Token::Colon(_) => items.push_str(":"),
         raffia::token::Token::ColonColon(_) => items.push_str("::"),
         raffia::token::Token::Comma(_) => items.push_str(","),
-        raffia::token::Token::Dedent(_) => todo!(),
+        raffia::token::Token::Dedent(_) => items.push_str("<dedent>"),
         raffia::token::Token::Dimension(dimension) => {
             items.push_str(dimension.value.raw);
             items.push_str(dimension.unit.raw);
         }
         raffia::token::Token::DollarEqual(_) => items.push_str("$="),
-        raffia::token::Token::DollarVar(_) => todo!(),
+        raffia::token::Token::DollarVar(var) => {
+            items.push_str("$");
+            items.push_str(var.ident.raw);
+        }
         raffia::token::Token::Dot(_) => items.push_str("."),
         raffia::token::Token::DotDotDot(_) => items.push_str("..."),
         raffia::token::Token::Equal(_) => items.push_str("="),
@@ -525,7 +533,7 @@ fn parse_token_with_span(node: &TokenWithSpan) -> PrintItems {
         raffia::token::Token::Hash(_) => items.push_str("#"),
         raffia::token::Token::HashLBrace(_) => items.push_str("#{"),
         raffia::token::Token::Ident(ident) => items.push_str(ident.raw),
-        raffia::token::Token::Indent(_) => todo!(),
+        raffia::token::Token::Indent(_) => items.push_str("<indent>"),
         raffia::token::Token::LBrace(_) => items.push_str("{"),
         raffia::token::Token::LBracket(_) => items.push_str("["),
         raffia::token::Token::LessThan(_) => items.push_str("<"),

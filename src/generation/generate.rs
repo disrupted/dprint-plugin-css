@@ -4,8 +4,8 @@ use raffia::ast::{
     AtRule, Calc, Combinator, ComplexSelector, ComplexSelectorChild, ComponentValue,
     CompoundSelector, ContainerCondition, Declaration, Delimiter, Dimension, Function,
     InterpolableIdent, InterpolableStr, KeyframeBlock, MediaConditionKind, MediaFeature,
-    MediaFeatureComparisonKind, MediaInParens, NsPrefix, Number, QualifiedRule, QueryInParens,
-    Ratio, SelectorList, SimpleBlock, SimpleSelector, Url, WqName,
+    MediaFeatureComparisonKind, MediaInParens, NsPrefix, Number, PageSelectorList, QualifiedRule,
+    QueryInParens, Ratio, SelectorList, SimpleBlock, SimpleSelector, Url, WqName,
 };
 use raffia::token::TokenWithSpan;
 use raffia::Spanned;
@@ -76,7 +76,10 @@ fn gen_at_rule_instruction(node: AtRule) -> PrintItems {
     items.push_str(&node.name.name);
 
     if let Some(prelude) = node.prelude {
-        items.push_signal(Signal::SpaceOrNewLine);
+        match prelude {
+            raffia::ast::AtRulePrelude::Page(_) => (),
+            _ => items.push_signal(Signal::SpaceOrNewLine),
+        }
         match prelude {
             raffia::ast::AtRulePrelude::Charset(_) => todo!(),
             raffia::ast::AtRulePrelude::ColorProfile(_) => todo!(),
@@ -136,7 +139,7 @@ fn gen_at_rule_instruction(node: AtRule) -> PrintItems {
             }
             raffia::ast::AtRulePrelude::Namespace(_) => todo!(),
             raffia::ast::AtRulePrelude::Nest(_) => todo!(),
-            raffia::ast::AtRulePrelude::Page(_) => todo!(),
+            raffia::ast::AtRulePrelude::Page(page) => items.extend(parse_page(&page)),
             raffia::ast::AtRulePrelude::PositionFallback(_) => todo!(),
             raffia::ast::AtRulePrelude::Property(_) => todo!(),
             raffia::ast::AtRulePrelude::ScrollTimeline(_) => todo!(),
@@ -153,6 +156,24 @@ fn gen_at_rule_instruction(node: AtRule) -> PrintItems {
         items.extend(parse_simple_block(block));
     }
 
+    items
+}
+
+fn parse_page(page: &PageSelectorList) -> PrintItems {
+    let mut items = PrintItems::new();
+    for (i, selector) in page.selectors.iter().enumerate() {
+        if let Some(name) = &selector.name {
+            items.push_signal(Signal::SpaceIfNotTrailing);
+            items.extend(parse_interpolable_ident(&name));
+        }
+        for pseudo in &selector.pseudo {
+            items.push_str(":");
+            items.extend(parse_interpolable_ident(&pseudo.name));
+        }
+        if page.selectors.get(i + 1).is_some() {
+            items.push_str(",");
+        }
+    }
     items
 }
 
@@ -595,6 +616,7 @@ fn parse_simple_block(block: SimpleBlock) -> PrintItems {
     items.push_signal(Signal::NewLine);
 
     // parse statements inside block
+    let statements = block.statements.clone(); // TODO: get rid of clone
     block
         .statements
         .into_iter()
@@ -602,8 +624,12 @@ fn parse_simple_block(block: SimpleBlock) -> PrintItems {
         .for_each(|(i, statement)| {
             items.extend(ir_helpers::with_indent({
                 let mut items = PrintItems::new();
-                if i > 0 && !statement.is_declaration() {
-                    items.push_signal(Signal::NewLine);
+                if i > 0 {
+                    if let Some(prev_statement) = &statements.get(i - 1) {
+                        if !(statement.is_declaration() && prev_statement.is_declaration()) {
+                            items.push_signal(Signal::NewLine);
+                        }
+                    }
                 }
                 items.extend(gen_node(statement.into()));
                 items.push_signal(Signal::NewLine);

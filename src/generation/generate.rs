@@ -164,7 +164,7 @@ fn parse_page(page: &PageSelectorList) -> PrintItems {
     for (i, selector) in page.selectors.iter().enumerate() {
         if let Some(name) = &selector.name {
             items.push_signal(Signal::SpaceIfNotTrailing);
-            items.extend(parse_interpolable_ident(&name));
+            items.extend(parse_interpolable_ident(name));
         }
         for pseudo in &selector.pseudo {
             items.push_str(":");
@@ -626,7 +626,7 @@ fn parse_simple_block(block: SimpleBlock) -> PrintItems {
                 let mut items = PrintItems::new();
                 if i > 0 {
                     if let Some(prev_statement) = &statements.get(i - 1) {
-                        if !(statement.is_declaration() && prev_statement.is_declaration()) {
+                        if !statement.is_declaration() || !prev_statement.is_declaration() {
                             items.push_signal(Signal::NewLine);
                         }
                     }

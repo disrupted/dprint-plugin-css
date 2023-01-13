@@ -86,8 +86,15 @@ fn gen_at_rule_instruction(node: AtRule) -> PrintItems {
                 items.push_str(&charset.value);
                 items.push_str("\"");
                 items.push_str(";");
+            }
+            raffia::ast::AtRulePrelude::ColorProfile(color_profile) => match color_profile {
+                raffia::ast::ColorProfilePrelude::DashedIdent(dashed_ident) => {
+                    items.extend(parse_interpolable_ident(&dashed_ident));
+                }
+                raffia::ast::ColorProfilePrelude::DeviceCmyk(device_cmyk) => {
+                    items.push_str(device_cmyk.raw);
+                }
             },
-            raffia::ast::AtRulePrelude::ColorProfile(_) => todo!(),
             raffia::ast::AtRulePrelude::Container(container) => {
                 if let Some(name) = &container.name {
                     items.extend(parse_interpolable_ident(name));

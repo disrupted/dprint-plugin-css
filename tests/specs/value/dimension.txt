@@ -14,6 +14,7 @@ a { width: -.00em; }
 a { width: -.10em; }
 a { width: -0.0em; }
 a { width: -0.1em; }
+div { transform: rotate(45deg); }
 
 [expect]
 a {
@@ -74,4 +75,8 @@ a {
 
 a {
     width: -0.1em;
+}
+
+div {
+    transform: rotate(45deg);
 }

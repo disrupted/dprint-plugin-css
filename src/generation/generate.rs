@@ -744,7 +744,10 @@ fn parse_dimension(dimension: &Dimension) -> PrintItems {
             items.push_string(angle.value.value.to_string());
             items.push_str(&angle.unit.name);
         }
-        Dimension::Duration(_) => todo!(),
+        Dimension::Duration(duration) => {
+            items.push_string(duration.value.value.to_string());
+            items.push_str(&duration.unit.name);
+        },
         Dimension::Frequency(_) => todo!(),
         Dimension::Resolution(resolution) => {
             items.push_string(resolution.value.value.to_string());

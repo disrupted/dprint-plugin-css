@@ -15,6 +15,7 @@ a { width: -.10em; }
 a { width: -0.0em; }
 a { width: -0.1em; }
 div { transform: rotate(45deg); }
+div { transition-duration: 5s; }
 
 [expect]
 a {
@@ -79,4 +80,8 @@ a {
 
 div {
     transform: rotate(45deg);
+}
+
+div {
+    transition-duration: 5s;
 }

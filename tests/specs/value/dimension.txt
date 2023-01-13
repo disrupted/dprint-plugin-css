@@ -16,6 +16,7 @@ a { width: -0.0em; }
 a { width: -0.1em; }
 div { transform: rotate(45deg); }
 div { transition-duration: 5s; }
+div { frequency: 14.44kHz; }
 
 [expect]
 a {
@@ -84,4 +85,8 @@ div {
 
 div {
     transition-duration: 5s;
+}
+
+div {
+    frequency: 14.44kHz;
 }

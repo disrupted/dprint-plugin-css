@@ -105,7 +105,42 @@ fn gen_at_rule_instruction(node: AtRule) -> PrintItems {
             raffia::ast::AtRulePrelude::CounterStyle(counter_style) => {
                 items.extend(parse_interpolable_ident(&counter_style));
             }
-            raffia::ast::AtRulePrelude::CustomMedia(_) => todo!(),
+            raffia::ast::AtRulePrelude::CustomMedia(custom_media) => {
+                items.extend(parse_interpolable_ident(&custom_media.name));
+                items.push_signal(Signal::SpaceOrNewLine);
+                match custom_media.value {
+                    raffia::ast::CustomMediaValue::MediaQueryList(media_query_list) => {
+                        for query in media_query_list.queries {
+                            match query {
+                                raffia::ast::MediaQuery::ConditionOnly(condition_only) => {
+                                    items
+                                        .extend(parse_media_conditions(&condition_only.conditions));
+                                }
+                                raffia::ast::MediaQuery::WithType(with_type) => {
+                                    if let Some(modifier) = &with_type.modifier {
+                                        items.push_str(modifier.raw);
+                                        items.push_signal(Signal::SpaceOrNewLine);
+                                    }
+                                    items.extend(parse_interpolable_ident(&with_type.media_type));
+                                    items.push_signal(Signal::SpaceOrNewLine);
+                                    if let Some(condition) = &with_type.condition {
+                                        items.push_str("and");
+                                        items.push_signal(Signal::SpaceOrNewLine);
+                                        items.extend(parse_media_conditions(&condition.conditions));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    raffia::ast::CustomMediaValue::True(t) => {
+                        items.push_str(&t.name);
+                    }
+                    raffia::ast::CustomMediaValue::False(f) => {
+                        items.push_str(&f.name);
+                    }
+                }
+                items.push_str(";");
+            }
             raffia::ast::AtRulePrelude::Document(_) => todo!(),
             raffia::ast::AtRulePrelude::FontFeatureValues(_) => todo!(),
             raffia::ast::AtRulePrelude::FontPaletteValues(_) => todo!(),

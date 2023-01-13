@@ -392,7 +392,7 @@ fn parse_combinator(combinator: &Combinator) -> PrintItems {
         raffia::ast::CombinatorKind::NextSibling => " + ",
         raffia::ast::CombinatorKind::Child => " > ",
         raffia::ast::CombinatorKind::LaterSibling => " ~ ",
-        raffia::ast::CombinatorKind::Column => "||",
+        raffia::ast::CombinatorKind::Column => " || ",
     });
     items
 }
@@ -434,7 +434,7 @@ fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
         }
         SimpleSelector::Type(typ) => match typ {
             raffia::ast::TypeSelector::TagName(tag_name) => {
-                items.push_str(&tag_name.name.name.as_literal().unwrap().name);
+                items.extend(parse_wq_name(&tag_name.name));
             }
             raffia::ast::TypeSelector::Universal(universal) => {
                 if let Some(ns_prefix) = &universal.prefix {

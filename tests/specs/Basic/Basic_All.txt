@@ -141,7 +141,7 @@ div p,
 div > p,
 div + p,
 div ~ p,
-column-selector||cell-selector {
+column-selector || cell-selector {
     background-color: yellow;
 }
 

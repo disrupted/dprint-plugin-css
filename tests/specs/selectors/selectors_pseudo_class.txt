@@ -177,9 +177,9 @@ h1:-webkit-any(.h1class, #bar) {}
 
 button:hover {}
 
-div:before {}
+div\:before {}
 
-div::before {}
+div\::before {}
 
 iNpUt {}
 

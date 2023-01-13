@@ -81,7 +81,12 @@ fn gen_at_rule_instruction(node: AtRule) -> PrintItems {
             _ => items.push_signal(Signal::SpaceOrNewLine),
         }
         match prelude {
-            raffia::ast::AtRulePrelude::Charset(_) => todo!(),
+            raffia::ast::AtRulePrelude::Charset(charset) => {
+                items.push_str("\"");
+                items.push_str(&charset.value);
+                items.push_str("\"");
+                items.push_str(";");
+            },
             raffia::ast::AtRulePrelude::ColorProfile(_) => todo!(),
             raffia::ast::AtRulePrelude::Container(container) => {
                 if let Some(name) = &container.name {

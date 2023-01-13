@@ -141,7 +141,18 @@ fn gen_at_rule_instruction(node: AtRule) -> PrintItems {
                 }
                 items.push_str(";");
             }
-            raffia::ast::AtRulePrelude::Document(_) => todo!(),
+            raffia::ast::AtRulePrelude::Document(document) => {
+                for matcher in document.matchers {
+                    match matcher {
+                        raffia::ast::DocumentPreludeMatcher::Url(url) => {
+                            items.extend(parse_url(&url));
+                        }
+                        raffia::ast::DocumentPreludeMatcher::Function(function) => {
+                            items.extend(parse_function(&function));
+                        }
+                    }
+                }
+            }
             raffia::ast::AtRulePrelude::FontFeatureValues(_) => todo!(),
             raffia::ast::AtRulePrelude::FontPaletteValues(_) => todo!(),
             raffia::ast::AtRulePrelude::Import(_) => todo!(),

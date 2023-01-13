@@ -1,0 +1,13 @@
+== should format at rule document ==
+@document url("http://www.example.com/") {
+  body {
+    background: white;
+  }
+}
+
+[expect]
+@document url("http://www.example.com/") {
+    body {
+        background: white;
+    }
+}

@@ -756,7 +756,10 @@ fn parse_dimension(dimension: &Dimension) -> PrintItems {
             items.push_string(resolution.value.value.to_string());
             items.push_str(&resolution.unit.name);
         }
-        Dimension::Flex(_) => todo!(),
+        Dimension::Flex(flex) => {
+            items.push_string(flex.value.value.to_string());
+            items.push_str(&flex.unit.name);
+        },
         Dimension::Unknown(unknown) => {
             items.push_string(unknown.value.value.to_string());
             items.push_str(&unknown.unit.name);

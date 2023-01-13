@@ -1,0 +1,13 @@
+== should format at rule counter-style ==
+@counter-style thumbs {
+  system: cyclic;
+  symbols: "\1F44D";
+  suffix: " ";
+}
+
+[expect]
+@counter-style thumbs {
+    system: cyclic;
+    symbols: "👍";
+    suffix: " ";
+}

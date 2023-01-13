@@ -102,7 +102,9 @@ fn gen_at_rule_instruction(node: AtRule) -> PrintItems {
                 items.push_signal(Signal::SpaceOrNewLine);
                 items.extend(parse_container_condition(&container.condition));
             }
-            raffia::ast::AtRulePrelude::CounterStyle(_) => todo!(),
+            raffia::ast::AtRulePrelude::CounterStyle(counter_style) => {
+                items.extend(parse_interpolable_ident(&counter_style));
+            }
             raffia::ast::AtRulePrelude::CustomMedia(_) => todo!(),
             raffia::ast::AtRulePrelude::Document(_) => todo!(),
             raffia::ast::AtRulePrelude::FontFeatureValues(_) => todo!(),
@@ -759,11 +761,11 @@ fn parse_dimension(dimension: &Dimension) -> PrintItems {
         Dimension::Duration(duration) => {
             items.push_string(duration.value.value.to_string());
             items.push_str(&duration.unit.name);
-        },
+        }
         Dimension::Frequency(frequency) => {
             items.push_string(frequency.value.value.to_string());
             items.push_str(&frequency.unit.name);
-        },
+        }
         Dimension::Resolution(resolution) => {
             items.push_string(resolution.value.value.to_string());
             items.push_str(&resolution.unit.name);
@@ -771,7 +773,7 @@ fn parse_dimension(dimension: &Dimension) -> PrintItems {
         Dimension::Flex(flex) => {
             items.push_string(flex.value.value.to_string());
             items.push_str(&flex.unit.name);
-        },
+        }
         Dimension::Unknown(unknown) => {
             items.push_string(unknown.value.value.to_string());
             items.push_str(&unknown.unit.name);

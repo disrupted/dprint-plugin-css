@@ -282,10 +282,18 @@ fn parse_supports_condition(supports_condition: &SupportsCondition) -> PrintItem
                 items.push_signal(Signal::SpaceIfNotTrailing);
                 items.extend(parse_supports_in_parens(&not.condition));
             }
-            raffia::ast::SupportsConditionKind::And(_) => todo!(),
-            raffia::ast::SupportsConditionKind::Or(_) => todo!(),
-            raffia::ast::SupportsConditionKind::SupportsInParens(_) => {
-                todo!()
+            raffia::ast::SupportsConditionKind::And(and) => {
+                items.push_str(&and.keyword.name);
+                items.push_signal(Signal::SpaceIfNotTrailing);
+                items.extend(parse_supports_in_parens(&and.condition));
+            }
+            raffia::ast::SupportsConditionKind::Or(or) => {
+                items.push_str(&or.keyword.name);
+                items.push_signal(Signal::SpaceIfNotTrailing);
+                items.extend(parse_supports_in_parens(&or.condition));
+            }
+            raffia::ast::SupportsConditionKind::SupportsInParens(supports_in_parens) => {
+                items.extend(parse_supports_in_parens(supports_in_parens));
             }
         }
     }

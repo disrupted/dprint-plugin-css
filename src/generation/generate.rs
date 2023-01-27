@@ -153,7 +153,14 @@ fn gen_at_rule_instruction(node: AtRule) -> PrintItems {
                     }
                 }
             }
-            raffia::ast::AtRulePrelude::FontFeatureValues(_) => todo!(),
+            raffia::ast::AtRulePrelude::FontFeatureValues(font_feature) => match font_feature {
+                raffia::ast::FontFamilyName::Str(str) => items.extend(parse_interpolable_str(&str)),
+                raffia::ast::FontFamilyName::Unquoted(unquoted) => {
+                    for ident in unquoted.idents {
+                        items.extend(parse_interpolable_ident(&ident));
+                    }
+                }
+            },
             raffia::ast::AtRulePrelude::FontPaletteValues(_) => todo!(),
             raffia::ast::AtRulePrelude::Import(_) => todo!(),
             raffia::ast::AtRulePrelude::Keyframes(keyframes) => match keyframes {

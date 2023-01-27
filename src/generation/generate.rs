@@ -156,7 +156,10 @@ fn gen_at_rule_instruction(node: AtRule) -> PrintItems {
             raffia::ast::AtRulePrelude::FontFeatureValues(font_feature) => match font_feature {
                 raffia::ast::FontFamilyName::Str(str) => items.extend(parse_interpolable_str(&str)),
                 raffia::ast::FontFamilyName::Unquoted(unquoted) => {
-                    for ident in unquoted.idents {
+                    for (i, ident) in unquoted.idents.iter().enumerate() {
+                        if i > 0 {
+                            items.push_signal(Signal::SpaceIfNotTrailing);
+                        }
                         items.extend(parse_interpolable_ident(&ident));
                     }
                 }

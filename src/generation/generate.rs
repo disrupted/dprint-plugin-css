@@ -141,7 +141,7 @@ fn gen_at_rule_instruction(node: AtRule) -> PrintItems {
                         if i > 0 {
                             items.push_signal(Signal::SpaceIfNotTrailing);
                         }
-                        items.extend(parse_interpolable_ident(&ident));
+                        items.extend(parse_interpolable_ident(ident));
                     }
                 }
             },
@@ -297,7 +297,7 @@ fn parse_supports_in_parens(supports_in_parens: &SupportsInParens) -> PrintItems
     items.push_str("(");
     match supports_in_parens {
         SupportsInParens::SupportsCondition(supports_condition) => {
-            items.extend(parse_supports_condition(&supports_condition))
+            items.extend(parse_supports_condition(supports_condition))
         }
         SupportsInParens::Feature(feature) => {
             items.extend(gen_declaration_instruction(&feature.decl, true));
@@ -425,10 +425,10 @@ fn parse_condition_query_in_parens(query: &QueryInParens) -> PrintItems {
     items.push_str("(");
     match query {
         raffia::ast::QueryInParens::ContainerCondition(nested_condition) => {
-            items.extend(parse_container_condition(&nested_condition))
+            items.extend(parse_container_condition(nested_condition))
         }
         raffia::ast::QueryInParens::SizeFeature(size_feature) => {
-            items.extend(parse_media_feature(&size_feature))
+            items.extend(parse_media_feature(size_feature))
         }
         raffia::ast::QueryInParens::StyleQuery(_) => todo!(),
     }

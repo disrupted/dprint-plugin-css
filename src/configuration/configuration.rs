@@ -6,5 +6,6 @@ use serde::{Deserialize, Serialize};
 pub struct Configuration {
     pub use_tabs: bool,
     pub indent_width: u8,
+    pub line_width: u32,
     pub new_line_kind: NewLineKind,
 }

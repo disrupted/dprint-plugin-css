@@ -1,0 +1,17 @@
+== should format at rule scroll-timeline ==
+@scroll-timeline scroll-in-document-timeline {
+  source: auto;
+  orientation: vertical;
+  scroll-offsets: 0%, 100%;
+}
+
+@scroll-timeline progressbar-timeline { }
+
+[expect]
+@scroll-timeline scroll-in-document-timeline {
+    source: auto;
+    orientation: vertical;
+    scroll-offsets: 0%, 100%;
+}
+
+@scroll-timeline progressbar-timeline {}

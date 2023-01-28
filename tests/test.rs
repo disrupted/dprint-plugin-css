@@ -27,13 +27,12 @@ fn test_specs() {
             format_twice: true,
         },
         {
-            let global_config = global_config.clone();
             move |file_path, file_text, spec_config| {
                 let config_result =
                     resolve_config(parse_config_key_map(spec_config), &global_config);
                 ensure_no_diagnostics(&config_result.diagnostics);
 
-                format_text(file_path, &file_text, &config_result.config)
+                format_text(file_path, file_text, &config_result.config)
             }
         },
         move |_file_path, _file_text, _spec_config| {
@@ -62,5 +61,5 @@ fn should_handle_windows_newlines() {
     let file_text =
         format_text(&PathBuf::from("file.css"), "body{color:black}\r\n", &config).unwrap();
 
-    assert_eq!(file_text, "body {\n  color: #000;\n}\n");
+    assert_eq!(file_text, "body {\n    color: black;\n}\n");
 }

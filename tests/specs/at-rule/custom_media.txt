@@ -1,0 +1,11 @@
+== should format at rule custom-media ==
+@custom-media --narrow-window (max-width: 30em);
+@custom-media --phone (width < 480px) and (--portrait);
+@custom-media --sm-viewport only screen and (min-width: 576px);
+
+[expect]
+@custom-media --narrow-window (max-width: 30em);
+
+@custom-media --phone (width < 480px) and (--portrait);
+
+@custom-media --sm-viewport only screen and (min-width: 576px);

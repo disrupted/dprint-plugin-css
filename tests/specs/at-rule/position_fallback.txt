@@ -1,0 +1,25 @@
+== should format at rule position-fallback ==
+@position-fallback --button-popover {
+  @try {
+    top: anchor(--button bottom);
+    left: anchor(--button left);
+  }
+
+  @try {
+    bottom: anchor(--button top);
+    left: anchor(--button left);
+  }
+}
+
+[expect]
+@position-fallback --button-popover {
+    @try {
+        top: anchor(--button bottom);
+        left: anchor(--button left);
+    }
+
+    @try {
+        bottom: anchor(--button top);
+        left: anchor(--button left);
+    }
+}

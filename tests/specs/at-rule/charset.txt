@@ -1,0 +1,5 @@
+== should format at rule charset ==
+@charset "utf-8";
+
+[expect]
+@charset "utf-8";

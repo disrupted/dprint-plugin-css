@@ -1,0 +1,32 @@
+== should format calc value ==
+:root {
+  font-size: calc(100vw / 35);
+}
+
+div {
+  --width: calc(10% + 30px);
+
+  width: calc(0px);
+  line-height: calc(0);
+  line-height: calc(2 + 3 * 4);
+  line-height: calc(3 * 4 + 2);
+  line-height: calc((2 + 3) * 4);
+  line-height: calc(4 * (2 + 3));
+  line-height: calc(-5 * 0);
+}
+
+[expect]
+:root {
+    font-size: calc(100vw / 35);
+}
+
+div {
+    --width: calc(10% + 30px);
+    width: calc(0px);
+    line-height: calc(0);
+    line-height: calc(2 + 3 * 4);
+    line-height: calc(3 * 4 + 2);
+    line-height: calc((2 + 3) * 4);
+    line-height: calc(4 * (2 + 3));
+    line-height: calc(-5 * 0);
+}

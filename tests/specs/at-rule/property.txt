@@ -1,0 +1,13 @@
+== should format at rule property ==
+@property --property-name {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: #c0ffee;
+}
+
+[expect]
+@property --property-name {
+    syntax: "<color>";
+    inherits: false;
+    initial-value: #c0ffee;
+}

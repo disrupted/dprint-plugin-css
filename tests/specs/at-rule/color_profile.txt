@@ -1,0 +1,16 @@
+== should format at rule color profile ==
+@color-profile --swop5c {
+  src: url("https://example.org/SWOP2006_Coated5v2.icc");
+}
+@color-profile device-cmyk {
+  src: url('https://drafts.csswg.org/css-color-4/ICCprofiles/Coated_Fogra39L_VIGC_300.icc');
+}
+
+[expect]
+@color-profile --swop5c {
+    src: url("https://example.org/SWOP2006_Coated5v2.icc");
+}
+
+@color-profile device-cmyk {
+    src: url("https://drafts.csswg.org/css-color-4/ICCprofiles/Coated_Fogra39L_VIGC_300.icc");
+}

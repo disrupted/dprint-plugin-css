@@ -1,0 +1,8 @@
+== should format at rule namespace ==
+@namespace toto "http://toto.example.org";
+@namespace "http://example.com/foo";
+
+[expect]
+@namespace toto "http://toto.example.org";
+
+@namespace "http://example.com/foo";

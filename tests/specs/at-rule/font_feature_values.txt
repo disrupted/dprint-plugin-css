@@ -1,0 +1,13 @@
+== should format at rule font-feature-values ==
+@font-feature-values Font One {
+  @styleset {
+    nice-style: 12;
+  }
+}
+
+[expect]
+@font-feature-values Font One {
+    @styleset {
+        nice-style: 12;
+    }
+}

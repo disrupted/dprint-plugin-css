@@ -47,6 +47,14 @@ pub fn resolve_config(
                 .unwrap_or(DEFAULT_GLOBAL_CONFIGURATION.indent_width),
             &mut diagnostics,
         ),
+        line_width: get_value(
+            &mut config,
+            "lineWidth",
+            global_config
+                .line_width
+                .unwrap_or(DEFAULT_GLOBAL_CONFIGURATION.line_width),
+            &mut diagnostics,
+        ),
         new_line_kind: get_value(
             &mut config,
             "newLineKind",

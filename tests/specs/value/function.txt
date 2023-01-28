@@ -1,0 +1,10 @@
+== should format function values ==
+
+a {
+  prop: element(#abc) alpha(opacity=75);
+}
+
+[expect]
+a {
+    prop: element(#abc) alpha(opacity=75);
+}

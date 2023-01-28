@@ -1,12 +1,18 @@
 {
   "incremental": true,
   "css": {
+    "indentWidth": 2,
+    "lineWidth": 80
+  },
+  "json": {
+    "indentWidth": 2
   },
   "includes": [
     "**/*.{css}"
   ],
   "excludes": [],
   "plugins": [
-    "target/wasm32-unknown-unknown/release/dprint_plugin_css.wasm"
+    "target/wasm32-unknown-unknown/release/dprint_plugin_css.wasm",
+    "https://plugins.dprint.dev/json-0.16.0.wasm"
   ]
 }

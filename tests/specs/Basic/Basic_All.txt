@@ -1,7 +1,158 @@
 == should format basic ==
-body{color:black}
+body{color:#000}
 
 [expect]
 body {
-  color: #000;
+    color: #000;
 }
+
+== should format combined ==
+
+body   {
+  margin: 0;
+
+  font-family: -apple-system, BlinkMacSystemFont, "Ubuntu", sans-serif;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing: grayscale; }
+
+body {
+
+
+
+  background-color    :
+      black                  !important         ;
+}
+
+#id
+
+{
+  padding-left: 50vh;
+
+  height:   100em;
+}
+
+.class,
+
+
+.another-class {
+
+             background: #abcdef !important;
+
+}
+
+#element    {
+
+
+
+
+
+  width: 100%;
+  color: rgb(0, 128, 255);
+    margin-left:calc( var(  --logo-width)+  5px);
+}
+
+*  {  }
+::before,::after{--tw-content: '';}
+
+selector:pseudo-class {
+}
+
+abbr:where([title]) {
+  text-decoration: underline dotted;
+}
+a[class~="logo"], a[href$=".org"], a[href*="example"], a[href^="http"],div[lang|="zh"],a[href*="cAsE" s]{
+    padding: 2px;
+}
+@font-face{
+font-family:"Lato";
+src:url(/fonts/Lato-Regular.ttf)format("truetype");
+src:url("http://example.com/fonts/Lato-Regular.ttf")format("truetype");
+        src:local();
+}
+
+div p,div>p,div+p,div~p,column-selector||cell-selector {
+  background-color: yellow;
+}
+dd:nth(4){
+border: 2px solid orange;
+}
+div.sidebar:has(*:nth-child(5)):not(:has(*:nth-child(6))) {}
+:not(em,strong#foo) {}
+section:not(:has(h1, h2, h3, h4, h5, h6)) {}
+html|*:not(:link):not(:visited) {}
+
+[expect]
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Ubuntu", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    background-color: black !important;
+}
+
+#id {
+    padding-left: 50vh;
+    height: 100em;
+}
+
+.class,
+.another-class {
+    background: #abcdef !important;
+}
+
+#element {
+    width: 100%;
+    color: rgb(0, 128, 255);
+    margin-left: calc(var(--logo-width) + 5px);
+}
+
+* {}
+
+::before,
+::after {
+    --tw-content: '';
+}
+
+selector:pseudo-class {}
+
+abbr:where([title]) {
+    text-decoration: underline dotted;
+}
+
+a[class~="logo"],
+a[href$=".org"],
+a[href*="example"],
+a[href^="http"],
+div[lang|="zh"],
+a[href*="cAsE" s] {
+    padding: 2px;
+}
+
+@font-face {
+    font-family: "Lato";
+    src: url(/fonts/Lato-Regular.ttf) format("truetype");
+    src: url("http://example.com/fonts/Lato-Regular.ttf") format("truetype");
+    src: local();
+}
+
+div p,
+div > p,
+div + p,
+div ~ p,
+column-selector || cell-selector {
+    background-color: yellow;
+}
+
+dd:nth(4) {
+    border: 2px solid orange;
+}
+
+div.sidebar:has(*:nth-child(5)):not(:has(*:nth-child(6))) {}
+
+:not(em, strong#foo) {}
+
+section:not(:has(h1, h2, h3, h4, h5, h6)) {}
+
+html|*:not(:link):not(:visited) {}

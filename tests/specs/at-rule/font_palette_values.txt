@@ -1,0 +1,9 @@
+== should format at rule font-palette-values ==
+@font-palette-values --identifier {
+  font-family: Bixa;
+}
+
+[expect]
+@font-palette-values --identifier {
+    font-family: Bixa;
+}

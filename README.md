@@ -7,5 +7,3 @@ Wrapper around [Raffia](https://github.com/g-plane/raffia) for use as a formatti
 ```sh
 dprint config add disrupted/css
 ```
-
-Note: for now there are no configuration options

@@ -1,0 +1,13 @@
+== should format at rule supports ==
+@supports (display: grid) {
+  .main {
+    display: grid;
+  }
+}
+
+[expect]
+@supports (display: grid) {
+    .main {
+        display: grid;
+    }
+}

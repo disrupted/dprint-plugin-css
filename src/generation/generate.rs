@@ -248,7 +248,9 @@ fn gen_at_rule_instruction(node: AtRule) -> PrintItems {
             raffia::ast::AtRulePrelude::Property(property) => {
                 items.extend(parse_interpolable_ident(&property))
             }
-            raffia::ast::AtRulePrelude::ScrollTimeline(_) => todo!(),
+            raffia::ast::AtRulePrelude::ScrollTimeline(scroll_timeline) => {
+                items.extend(parse_interpolable_ident(&scroll_timeline))
+            }
             raffia::ast::AtRulePrelude::Supports(_) => todo!(),
             raffia::ast::AtRulePrelude::Unknown(unknown) => {
                 for token in unknown.tokens {

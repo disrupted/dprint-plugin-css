@@ -1,0 +1,16 @@
+== should format at rule nest ==
+.foo {
+  color: red;
+  @nest & > .bar {
+    color: blue;
+  }
+}
+
+[expect]
+.foo {
+    color: red;
+
+    @nest & > .bar {
+        color: blue;
+    }
+}

@@ -236,7 +236,11 @@ fn gen_at_rule_instruction(node: AtRule) -> PrintItems {
                 }
                 items.push_str(";");
             }
-            raffia::ast::AtRulePrelude::Nest(_) => todo!(),
+            raffia::ast::AtRulePrelude::Nest(nest) => {
+                nest.selectors
+                    .iter()
+                    .for_each(|selector| items.extend(gen_complex_selector(selector)));
+            }
             raffia::ast::AtRulePrelude::Page(page) => items.extend(parse_page(&page)),
             raffia::ast::AtRulePrelude::PositionFallback(_) => todo!(),
             raffia::ast::AtRulePrelude::Property(_) => todo!(),

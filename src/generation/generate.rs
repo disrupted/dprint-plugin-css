@@ -243,13 +243,11 @@ fn gen_at_rule_instruction(node: AtRule) -> PrintItems {
             }
             raffia::ast::AtRulePrelude::Page(page) => items.extend(parse_page(&page)),
             raffia::ast::AtRulePrelude::PositionFallback(position_fallback) => {
-                match position_fallback {
-                    InterpolableIdent::Literal(literal) => items.push_str(literal.raw),
-                    InterpolableIdent::SassInterpolated(_) => todo!(),
-                    InterpolableIdent::LessInterpolated(_) => todo!(),
-                }
+                items.extend(parse_interpolable_ident(&position_fallback))
             }
-            raffia::ast::AtRulePrelude::Property(_) => todo!(),
+            raffia::ast::AtRulePrelude::Property(property) => {
+                items.extend(parse_interpolable_ident(&property))
+            }
             raffia::ast::AtRulePrelude::ScrollTimeline(_) => todo!(),
             raffia::ast::AtRulePrelude::Supports(_) => todo!(),
             raffia::ast::AtRulePrelude::Unknown(unknown) => {

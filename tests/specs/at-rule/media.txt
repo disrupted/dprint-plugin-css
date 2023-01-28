@@ -184,8 +184,8 @@
 @media not ((width) or (height)) {}
 @media not ((width) and (not (height))) {}
 
-@MeDIa aLL and (Height) AnD (mIN-Width:0cM) aND (orienTAtion:LandScape) {}
-@MeDIa nOT All and (heiGHt) and (Min-widtH:0MM) and (Orientation:porTrait) {}
+@MeDIa aLL and (Height) and (mIN-Width:0cM) and (orienTAtion:LandScape) {}
+@MeDIa not All and (heiGHt) and (Min-widtH:0MM) and (Orientation:porTrait) {}
 
 @media (--FOO: bar) {}
 
@@ -538,7 +538,7 @@
 
 @MeDIa aLL and (Height) and (mIN-Width: 0cM) and (orienTAtion: LandScape) {}
 
-@MeDIa nOT All and (heiGHt) and (Min-widtH: 0MM) and (Orientation: porTrait) {}
+@MeDIa not All and (heiGHt) and (Min-widtH: 0MM) and (Orientation: porTrait) {}
 
 @media (--FOO: bar) {}
 

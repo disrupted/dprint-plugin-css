@@ -6,7 +6,7 @@ use raffia::ast::{
     InterpolableIdent, InterpolableStr, KeyframeBlock, MediaConditionKind, MediaFeature,
     MediaFeatureComparisonKind, MediaInParens, MediaQueryList, NsPrefix, Number, PageSelectorList,
     QualifiedRule, QueryInParens, Ratio, SelectorList, SimpleBlock, SimpleSelector,
-    SupportsCondition, SupportsInParens, Url, WqName,
+    StyleConditionKind, StyleInParens, SupportsCondition, SupportsInParens, Url, WqName,
 };
 use raffia::token::TokenWithSpan;
 use raffia::Spanned;
@@ -464,7 +464,57 @@ fn parse_condition_query_in_parens(query: &QueryInParens) -> PrintItems {
         raffia::ast::QueryInParens::SizeFeature(size_feature) => {
             items.extend(parse_media_feature(size_feature))
         }
-        raffia::ast::QueryInParens::StyleQuery(_) => todo!(),
+        raffia::ast::QueryInParens::StyleQuery(style_query) => match style_query {
+            raffia::ast::StyleQuery::Condition(condition) => {
+                items.extend(parse_style_conditions(&condition.conditions))
+            }
+            raffia::ast::StyleQuery::Feature(feature) => {
+                items.extend(gen_declaration_instruction(feature, true))
+            }
+        },
+    }
+    items.push_str(")");
+    items
+}
+
+fn parse_style_conditions(conditions: &[StyleConditionKind]) -> PrintItems {
+    let mut items = PrintItems::new();
+    for (i, condition) in conditions.iter().enumerate() {
+        if i > 0 {
+            items.push_signal(Signal::SpaceIfNotTrailing);
+        }
+        match condition {
+            raffia::ast::StyleConditionKind::StyleInParens(style_in_parens) => {
+                items.extend(parse_style_in_parens(style_in_parens));
+            }
+            raffia::ast::StyleConditionKind::And(and) => {
+                items.push_str(&and.keyword.name);
+                items.push_signal(Signal::SpaceIfNotTrailing);
+                items.extend(parse_style_in_parens(&and.style_in_parens));
+            }
+            raffia::ast::StyleConditionKind::Or(or) => {
+                items.push_str(&or.keyword.name);
+                items.push_signal(Signal::SpaceIfNotTrailing);
+                items.extend(parse_style_in_parens(&or.style_in_parens));
+            }
+            raffia::ast::StyleConditionKind::Not(not) => {
+                items.push_str(&not.keyword.name);
+                items.push_signal(Signal::SpaceIfNotTrailing);
+                items.extend(parse_style_in_parens(&not.style_in_parens));
+            }
+        }
+    }
+    items
+}
+
+fn parse_style_in_parens(style: &StyleInParens) -> PrintItems {
+    let mut items = PrintItems::new();
+    items.push_str("(");
+    match style {
+        StyleInParens::Condition(condition) => {
+            items.extend(parse_style_conditions(&condition.conditions))
+        }
+        StyleInParens::Feature(feature) => items.extend(gen_declaration_instruction(feature, true)),
     }
     items.push_str(")");
     items
@@ -481,17 +531,17 @@ fn parse_media_conditions(conditions: &[MediaConditionKind]) -> PrintItems {
                 items.extend(parse_media_in_parens(media_in_parens));
             }
             raffia::ast::MediaConditionKind::And(and) => {
-                items.push_str("and");
+                items.push_str(&and.keyword.name);
                 items.push_signal(Signal::SpaceIfNotTrailing);
                 items.extend(parse_media_in_parens(&and.media_in_parens));
             }
             raffia::ast::MediaConditionKind::Or(or) => {
-                items.push_str("or");
+                items.push_str(&or.keyword.name);
                 items.push_signal(Signal::SpaceIfNotTrailing);
                 items.extend(parse_media_in_parens(&or.media_in_parens));
             }
             raffia::ast::MediaConditionKind::Not(not) => {
-                items.push_str("not");
+                items.push_str(&not.keyword.name);
                 items.push_signal(Signal::SpaceIfNotTrailing);
                 items.extend(parse_media_in_parens(&not.media_in_parens));
             }
@@ -503,12 +553,12 @@ fn parse_media_conditions(conditions: &[MediaConditionKind]) -> PrintItems {
 fn parse_media_in_parens(media: &MediaInParens) -> PrintItems {
     let mut items = PrintItems::new();
     items.push_str("(");
-    match media.clone() {
+    match media {
         MediaInParens::MediaCondition(media_condition) => {
             items.extend(parse_media_conditions(&media_condition.conditions))
         }
         MediaInParens::MediaFeature(media_feature) => {
-            items.extend(parse_media_feature(&media_feature))
+            items.extend(parse_media_feature(media_feature))
         }
     }
     items.push_str(")");

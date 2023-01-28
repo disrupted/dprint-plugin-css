@@ -145,7 +145,9 @@ fn gen_at_rule_instruction(node: AtRule) -> PrintItems {
                     }
                 }
             },
-            raffia::ast::AtRulePrelude::FontPaletteValues(_) => todo!(),
+            raffia::ast::AtRulePrelude::FontPaletteValues(font_palette_values) => {
+                items.extend(parse_interpolable_ident(&font_palette_values))
+            }
             raffia::ast::AtRulePrelude::Import(import) => {
                 match import.href {
                     raffia::ast::ImportPreludeHref::Str(str) => {

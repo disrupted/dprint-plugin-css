@@ -271,94 +271,6 @@ fn gen_at_rule_instruction(node: AtRule) -> PrintItems {
     items
 }
 
-fn parse_media_query_list(media_query_list: &MediaQueryList) -> PrintItems {
-    let mut items = PrintItems::new();
-    for (i, query) in media_query_list.queries.iter().enumerate() {
-        if i > 0 {
-            items.push_str(",");
-            items.push_signal(Signal::SpaceOrNewLine);
-        }
-        match query {
-            raffia::ast::MediaQuery::ConditionOnly(condition_only) => {
-                items.extend(parse_media_conditions(&condition_only.conditions));
-            }
-            raffia::ast::MediaQuery::WithType(with_type) => {
-                if let Some(modifier) = &with_type.modifier {
-                    items.push_str(modifier.raw);
-                    items.push_signal(Signal::SpaceOrNewLine);
-                }
-                items.extend(parse_interpolable_ident(&with_type.media_type));
-                if let Some(condition) = &with_type.condition {
-                    items.push_signal(Signal::SpaceOrNewLine);
-                    items.push_str("and");
-                    items.push_signal(Signal::SpaceOrNewLine);
-                    items.extend(parse_media_conditions(&condition.conditions));
-                }
-            }
-        }
-    }
-    items
-}
-fn parse_supports_condition(supports_condition: &SupportsCondition) -> PrintItems {
-    let mut items = PrintItems::new();
-    for condition in &supports_condition.conditions {
-        match condition {
-            raffia::ast::SupportsConditionKind::Not(not) => {
-                items.push_str(&not.keyword.name);
-                items.push_signal(Signal::SpaceIfNotTrailing);
-                items.extend(parse_supports_in_parens(&not.condition));
-            }
-            raffia::ast::SupportsConditionKind::And(and) => {
-                items.push_str(&and.keyword.name);
-                items.push_signal(Signal::SpaceIfNotTrailing);
-                items.extend(parse_supports_in_parens(&and.condition));
-            }
-            raffia::ast::SupportsConditionKind::Or(or) => {
-                items.push_str(&or.keyword.name);
-                items.push_signal(Signal::SpaceIfNotTrailing);
-                items.extend(parse_supports_in_parens(&or.condition));
-            }
-            raffia::ast::SupportsConditionKind::SupportsInParens(supports_in_parens) => {
-                items.extend(parse_supports_in_parens(supports_in_parens));
-            }
-        }
-    }
-    items
-}
-
-fn parse_supports_in_parens(supports_in_parens: &SupportsInParens) -> PrintItems {
-    let mut items = PrintItems::new();
-    items.push_str("(");
-    match supports_in_parens {
-        SupportsInParens::SupportsCondition(supports_condition) => {
-            items.extend(parse_supports_condition(supports_condition))
-        }
-        SupportsInParens::Feature(feature) => {
-            items.extend(gen_declaration_instruction(&feature.decl, true));
-        }
-    }
-    items.push_str(")");
-    items
-}
-
-fn parse_page(page: &PageSelectorList) -> PrintItems {
-    let mut items = PrintItems::new();
-    for (i, selector) in page.selectors.iter().enumerate() {
-        if let Some(name) = &selector.name {
-            items.push_signal(Signal::SpaceIfNotTrailing);
-            items.extend(parse_interpolable_ident(name));
-        }
-        for pseudo in &selector.pseudo {
-            items.push_str(":");
-            items.extend(parse_interpolable_ident(&pseudo.name));
-        }
-        if page.selectors.get(i + 1).is_some() {
-            items.push_str(",");
-        }
-    }
-    items
-}
-
 fn gen_keyframe_block(node: KeyframeBlock) -> PrintItems {
     let mut items = PrintItems::new();
     for (i, selector) in node.selectors.iter().enumerate() {
@@ -420,236 +332,6 @@ fn gen_compound_selector(compound_selector: &CompoundSelector) -> PrintItems {
         .children
         .iter()
         .for_each(|simple_selector| items.extend(gen_selector_instruction(simple_selector)));
-    items
-}
-
-fn parse_container_condition(condition: &ContainerCondition) -> PrintItems {
-    let mut items = PrintItems::new();
-    for (i, cond) in condition.conditions.clone().iter().enumerate() {
-        match cond {
-            raffia::ast::ContainerConditionKind::QueryInParens(query) => {
-                items.extend(parse_condition_query_in_parens(query))
-            }
-            raffia::ast::ContainerConditionKind::And(and) => {
-                items.push_str(&and.keyword.name);
-                items.push_signal(Signal::SpaceIfNotTrailing);
-                items.extend(parse_condition_query_in_parens(&and.query_in_parens));
-            }
-            raffia::ast::ContainerConditionKind::Or(or) => {
-                items.push_str(&or.keyword.name);
-                items.push_signal(Signal::SpaceIfNotTrailing);
-                items.extend(parse_condition_query_in_parens(&or.query_in_parens));
-            }
-            raffia::ast::ContainerConditionKind::Not(not) => {
-                items.push_str(&not.keyword.name);
-                items.push_signal(Signal::SpaceIfNotTrailing);
-                items.extend(parse_condition_query_in_parens(&not.query_in_parens));
-            }
-        }
-        if condition.conditions.get(i + 1).is_some() {
-            items.push_signal(Signal::SpaceIfNotTrailing);
-        }
-    }
-
-    items
-}
-
-fn parse_condition_query_in_parens(query: &QueryInParens) -> PrintItems {
-    let mut items = PrintItems::new();
-    items.push_str("(");
-    match query {
-        raffia::ast::QueryInParens::ContainerCondition(nested_condition) => {
-            items.extend(parse_container_condition(nested_condition))
-        }
-        raffia::ast::QueryInParens::SizeFeature(size_feature) => {
-            items.extend(parse_media_feature(size_feature))
-        }
-        raffia::ast::QueryInParens::StyleQuery(style_query) => match style_query {
-            raffia::ast::StyleQuery::Condition(condition) => {
-                items.extend(parse_style_conditions(&condition.conditions))
-            }
-            raffia::ast::StyleQuery::Feature(feature) => {
-                items.extend(gen_declaration_instruction(feature, true))
-            }
-        },
-    }
-    items.push_str(")");
-    items
-}
-
-fn parse_style_conditions(conditions: &[StyleConditionKind]) -> PrintItems {
-    let mut items = PrintItems::new();
-    for (i, condition) in conditions.iter().enumerate() {
-        if i > 0 {
-            items.push_signal(Signal::SpaceIfNotTrailing);
-        }
-        match condition {
-            raffia::ast::StyleConditionKind::StyleInParens(style_in_parens) => {
-                items.extend(parse_style_in_parens(style_in_parens));
-            }
-            raffia::ast::StyleConditionKind::And(and) => {
-                items.push_str(&and.keyword.name);
-                items.push_signal(Signal::SpaceIfNotTrailing);
-                items.extend(parse_style_in_parens(&and.style_in_parens));
-            }
-            raffia::ast::StyleConditionKind::Or(or) => {
-                items.push_str(&or.keyword.name);
-                items.push_signal(Signal::SpaceIfNotTrailing);
-                items.extend(parse_style_in_parens(&or.style_in_parens));
-            }
-            raffia::ast::StyleConditionKind::Not(not) => {
-                items.push_str(&not.keyword.name);
-                items.push_signal(Signal::SpaceIfNotTrailing);
-                items.extend(parse_style_in_parens(&not.style_in_parens));
-            }
-        }
-    }
-    items
-}
-
-fn parse_style_in_parens(style: &StyleInParens) -> PrintItems {
-    let mut items = PrintItems::new();
-    items.push_str("(");
-    match style {
-        StyleInParens::Condition(condition) => {
-            items.extend(parse_style_conditions(&condition.conditions))
-        }
-        StyleInParens::Feature(feature) => items.extend(gen_declaration_instruction(feature, true)),
-    }
-    items.push_str(")");
-    items
-}
-
-fn parse_media_conditions(conditions: &[MediaConditionKind]) -> PrintItems {
-    let mut items = PrintItems::new();
-    for (i, condition) in conditions.iter().enumerate() {
-        if i > 0 {
-            items.push_signal(Signal::SpaceIfNotTrailing);
-        }
-        match condition {
-            raffia::ast::MediaConditionKind::MediaInParens(media_in_parens) => {
-                items.extend(parse_media_in_parens(media_in_parens));
-            }
-            raffia::ast::MediaConditionKind::And(and) => {
-                items.push_str(&and.keyword.name);
-                items.push_signal(Signal::SpaceIfNotTrailing);
-                items.extend(parse_media_in_parens(&and.media_in_parens));
-            }
-            raffia::ast::MediaConditionKind::Or(or) => {
-                items.push_str(&or.keyword.name);
-                items.push_signal(Signal::SpaceIfNotTrailing);
-                items.extend(parse_media_in_parens(&or.media_in_parens));
-            }
-            raffia::ast::MediaConditionKind::Not(not) => {
-                items.push_str(&not.keyword.name);
-                items.push_signal(Signal::SpaceIfNotTrailing);
-                items.extend(parse_media_in_parens(&not.media_in_parens));
-            }
-        }
-    }
-    items
-}
-
-fn parse_media_in_parens(media: &MediaInParens) -> PrintItems {
-    let mut items = PrintItems::new();
-    items.push_str("(");
-    match media {
-        MediaInParens::MediaCondition(media_condition) => {
-            items.extend(parse_media_conditions(&media_condition.conditions))
-        }
-        MediaInParens::MediaFeature(media_feature) => {
-            items.extend(parse_media_feature(media_feature))
-        }
-    }
-    items.push_str(")");
-    items
-}
-
-fn parse_media_feature(media_feature: &MediaFeature) -> PrintItems {
-    let mut items = PrintItems::new();
-    match media_feature {
-        raffia::ast::MediaFeature::Plain(plain) => {
-            match &plain.name {
-                raffia::ast::MediaFeatureName::Ident(ident) => {
-                    items.extend(parse_interpolable_ident(ident))
-                }
-            };
-            items.push_str(":");
-            items.push_signal(Signal::SpaceIfNotTrailing);
-            items.extend(parse_component_value(&plain.value));
-        }
-        raffia::ast::MediaFeature::Boolean(bool) => match &bool.name {
-            raffia::ast::MediaFeatureName::Ident(ident) => {
-                items.extend(parse_interpolable_ident(ident))
-            }
-        },
-        raffia::ast::MediaFeature::Range(range) => {
-            items.extend(parse_component_value(&range.left));
-            items.push_str(parse_media_feature_kind(&range.comparison.kind));
-            items.extend(parse_component_value(&range.right));
-        }
-        raffia::ast::MediaFeature::RangeInterval(range_interval) => {
-            items.extend(parse_component_value(&range_interval.left));
-            items.push_str(parse_media_feature_kind(
-                &range_interval.left_comparison.kind,
-            ));
-            match &range_interval.name {
-                raffia::ast::MediaFeatureName::Ident(ident) => {
-                    items.extend(parse_interpolable_ident(ident))
-                }
-            }
-            items.push_str(parse_media_feature_kind(
-                &range_interval.right_comparison.kind,
-            ));
-            items.extend(parse_component_value(&range_interval.right));
-        }
-    }
-    items
-}
-
-fn parse_media_feature_kind(media_feature_kind: &MediaFeatureComparisonKind) -> &str {
-    match media_feature_kind {
-        raffia::ast::MediaFeatureComparisonKind::LessThan => " < ",
-        raffia::ast::MediaFeatureComparisonKind::LessThanOrEqual => " <= ",
-        raffia::ast::MediaFeatureComparisonKind::GreaterThan => " > ",
-        raffia::ast::MediaFeatureComparisonKind::GreaterThanOrEqual => " >= ",
-        raffia::ast::MediaFeatureComparisonKind::Equal => " = ",
-    }
-}
-
-fn parse_combinator(combinator: &Combinator) -> PrintItems {
-    let mut items = PrintItems::new();
-    items.push_str(match combinator.kind {
-        raffia::ast::CombinatorKind::Descendant => " ",
-        raffia::ast::CombinatorKind::NextSibling => " + ",
-        raffia::ast::CombinatorKind::Child => " > ",
-        raffia::ast::CombinatorKind::LaterSibling => " ~ ",
-        raffia::ast::CombinatorKind::Column => " || ",
-    });
-    items
-}
-
-fn parse_wq_name(wq_name: &WqName) -> PrintItems {
-    let mut items = PrintItems::new();
-
-    if let Some(ns_prefix) = &wq_name.prefix {
-        items.extend(parse_ns_prefix(ns_prefix));
-    }
-    items.extend(parse_interpolable_ident(&wq_name.name));
-    items
-}
-
-fn parse_ns_prefix(ns_prefix: &NsPrefix) -> PrintItems {
-    let mut items = PrintItems::new();
-    if let Some(kind) = &ns_prefix.kind {
-        match kind {
-            raffia::ast::NsPrefixKind::Ident(ident) => {
-                items.extend(parse_interpolable_ident(ident))
-            }
-            raffia::ast::NsPrefixKind::Universal(_) => items.push_str("*"),
-        }
-        items.push_str("|");
-    }
     items
 }
 
@@ -836,6 +518,325 @@ fn gen_declaration_instruction(node: &Declaration, nested: bool) -> PrintItems {
 
     if !nested {
         items.push_str(";");
+    }
+    items
+}
+
+fn parse_container_condition(condition: &ContainerCondition) -> PrintItems {
+    let mut items = PrintItems::new();
+    for (i, cond) in condition.conditions.clone().iter().enumerate() {
+        match cond {
+            raffia::ast::ContainerConditionKind::QueryInParens(query) => {
+                items.extend(parse_condition_query_in_parens(query))
+            }
+            raffia::ast::ContainerConditionKind::And(and) => {
+                items.push_str(&and.keyword.name);
+                items.push_signal(Signal::SpaceIfNotTrailing);
+                items.extend(parse_condition_query_in_parens(&and.query_in_parens));
+            }
+            raffia::ast::ContainerConditionKind::Or(or) => {
+                items.push_str(&or.keyword.name);
+                items.push_signal(Signal::SpaceIfNotTrailing);
+                items.extend(parse_condition_query_in_parens(&or.query_in_parens));
+            }
+            raffia::ast::ContainerConditionKind::Not(not) => {
+                items.push_str(&not.keyword.name);
+                items.push_signal(Signal::SpaceIfNotTrailing);
+                items.extend(parse_condition_query_in_parens(&not.query_in_parens));
+            }
+        }
+        if condition.conditions.get(i + 1).is_some() {
+            items.push_signal(Signal::SpaceIfNotTrailing);
+        }
+    }
+
+    items
+}
+
+fn parse_condition_query_in_parens(query: &QueryInParens) -> PrintItems {
+    let mut items = PrintItems::new();
+    items.push_str("(");
+    match query {
+        raffia::ast::QueryInParens::ContainerCondition(nested_condition) => {
+            items.extend(parse_container_condition(nested_condition))
+        }
+        raffia::ast::QueryInParens::SizeFeature(size_feature) => {
+            items.extend(parse_media_feature(size_feature))
+        }
+        raffia::ast::QueryInParens::StyleQuery(style_query) => match style_query {
+            raffia::ast::StyleQuery::Condition(condition) => {
+                items.extend(parse_style_conditions(&condition.conditions))
+            }
+            raffia::ast::StyleQuery::Feature(feature) => {
+                items.extend(gen_declaration_instruction(feature, true))
+            }
+        },
+    }
+    items.push_str(")");
+    items
+}
+
+fn parse_style_conditions(conditions: &[StyleConditionKind]) -> PrintItems {
+    let mut items = PrintItems::new();
+    for (i, condition) in conditions.iter().enumerate() {
+        if i > 0 {
+            items.push_signal(Signal::SpaceIfNotTrailing);
+        }
+        match condition {
+            raffia::ast::StyleConditionKind::StyleInParens(style_in_parens) => {
+                items.extend(parse_style_in_parens(style_in_parens));
+            }
+            raffia::ast::StyleConditionKind::And(and) => {
+                items.push_str(&and.keyword.name);
+                items.push_signal(Signal::SpaceIfNotTrailing);
+                items.extend(parse_style_in_parens(&and.style_in_parens));
+            }
+            raffia::ast::StyleConditionKind::Or(or) => {
+                items.push_str(&or.keyword.name);
+                items.push_signal(Signal::SpaceIfNotTrailing);
+                items.extend(parse_style_in_parens(&or.style_in_parens));
+            }
+            raffia::ast::StyleConditionKind::Not(not) => {
+                items.push_str(&not.keyword.name);
+                items.push_signal(Signal::SpaceIfNotTrailing);
+                items.extend(parse_style_in_parens(&not.style_in_parens));
+            }
+        }
+    }
+    items
+}
+
+fn parse_style_in_parens(style: &StyleInParens) -> PrintItems {
+    let mut items = PrintItems::new();
+    items.push_str("(");
+    match style {
+        StyleInParens::Condition(condition) => {
+            items.extend(parse_style_conditions(&condition.conditions))
+        }
+        StyleInParens::Feature(feature) => items.extend(gen_declaration_instruction(feature, true)),
+    }
+    items.push_str(")");
+    items
+}
+
+fn parse_media_query_list(media_query_list: &MediaQueryList) -> PrintItems {
+    let mut items = PrintItems::new();
+    for (i, query) in media_query_list.queries.iter().enumerate() {
+        if i > 0 {
+            items.push_str(",");
+            items.push_signal(Signal::SpaceOrNewLine);
+        }
+        match query {
+            raffia::ast::MediaQuery::ConditionOnly(condition_only) => {
+                items.extend(parse_media_conditions(&condition_only.conditions));
+            }
+            raffia::ast::MediaQuery::WithType(with_type) => {
+                if let Some(modifier) = &with_type.modifier {
+                    items.push_str(modifier.raw);
+                    items.push_signal(Signal::SpaceOrNewLine);
+                }
+                items.extend(parse_interpolable_ident(&with_type.media_type));
+                if let Some(condition) = &with_type.condition {
+                    items.push_signal(Signal::SpaceOrNewLine);
+                    items.push_str("and");
+                    items.push_signal(Signal::SpaceOrNewLine);
+                    items.extend(parse_media_conditions(&condition.conditions));
+                }
+            }
+        }
+    }
+    items
+}
+
+fn parse_supports_condition(supports_condition: &SupportsCondition) -> PrintItems {
+    let mut items = PrintItems::new();
+    for condition in &supports_condition.conditions {
+        match condition {
+            raffia::ast::SupportsConditionKind::Not(not) => {
+                items.push_str(&not.keyword.name);
+                items.push_signal(Signal::SpaceIfNotTrailing);
+                items.extend(parse_supports_in_parens(&not.condition));
+            }
+            raffia::ast::SupportsConditionKind::And(and) => {
+                items.push_str(&and.keyword.name);
+                items.push_signal(Signal::SpaceIfNotTrailing);
+                items.extend(parse_supports_in_parens(&and.condition));
+            }
+            raffia::ast::SupportsConditionKind::Or(or) => {
+                items.push_str(&or.keyword.name);
+                items.push_signal(Signal::SpaceIfNotTrailing);
+                items.extend(parse_supports_in_parens(&or.condition));
+            }
+            raffia::ast::SupportsConditionKind::SupportsInParens(supports_in_parens) => {
+                items.extend(parse_supports_in_parens(supports_in_parens));
+            }
+        }
+    }
+    items
+}
+
+fn parse_supports_in_parens(supports_in_parens: &SupportsInParens) -> PrintItems {
+    let mut items = PrintItems::new();
+    items.push_str("(");
+    match supports_in_parens {
+        SupportsInParens::SupportsCondition(supports_condition) => {
+            items.extend(parse_supports_condition(supports_condition))
+        }
+        SupportsInParens::Feature(feature) => {
+            items.extend(gen_declaration_instruction(&feature.decl, true));
+        }
+    }
+    items.push_str(")");
+    items
+}
+
+fn parse_page(page: &PageSelectorList) -> PrintItems {
+    let mut items = PrintItems::new();
+    for (i, selector) in page.selectors.iter().enumerate() {
+        if let Some(name) = &selector.name {
+            items.push_signal(Signal::SpaceIfNotTrailing);
+            items.extend(parse_interpolable_ident(name));
+        }
+        for pseudo in &selector.pseudo {
+            items.push_str(":");
+            items.extend(parse_interpolable_ident(&pseudo.name));
+        }
+        if page.selectors.get(i + 1).is_some() {
+            items.push_str(",");
+        }
+    }
+    items
+}
+
+fn parse_media_conditions(conditions: &[MediaConditionKind]) -> PrintItems {
+    let mut items = PrintItems::new();
+    for (i, condition) in conditions.iter().enumerate() {
+        if i > 0 {
+            items.push_signal(Signal::SpaceIfNotTrailing);
+        }
+        match condition {
+            raffia::ast::MediaConditionKind::MediaInParens(media_in_parens) => {
+                items.extend(parse_media_in_parens(media_in_parens));
+            }
+            raffia::ast::MediaConditionKind::And(and) => {
+                items.push_str(&and.keyword.name);
+                items.push_signal(Signal::SpaceIfNotTrailing);
+                items.extend(parse_media_in_parens(&and.media_in_parens));
+            }
+            raffia::ast::MediaConditionKind::Or(or) => {
+                items.push_str(&or.keyword.name);
+                items.push_signal(Signal::SpaceIfNotTrailing);
+                items.extend(parse_media_in_parens(&or.media_in_parens));
+            }
+            raffia::ast::MediaConditionKind::Not(not) => {
+                items.push_str(&not.keyword.name);
+                items.push_signal(Signal::SpaceIfNotTrailing);
+                items.extend(parse_media_in_parens(&not.media_in_parens));
+            }
+        }
+    }
+    items
+}
+
+fn parse_media_in_parens(media: &MediaInParens) -> PrintItems {
+    let mut items = PrintItems::new();
+    items.push_str("(");
+    match media {
+        MediaInParens::MediaCondition(media_condition) => {
+            items.extend(parse_media_conditions(&media_condition.conditions))
+        }
+        MediaInParens::MediaFeature(media_feature) => {
+            items.extend(parse_media_feature(media_feature))
+        }
+    }
+    items.push_str(")");
+    items
+}
+
+fn parse_media_feature(media_feature: &MediaFeature) -> PrintItems {
+    let mut items = PrintItems::new();
+    match media_feature {
+        raffia::ast::MediaFeature::Plain(plain) => {
+            match &plain.name {
+                raffia::ast::MediaFeatureName::Ident(ident) => {
+                    items.extend(parse_interpolable_ident(ident))
+                }
+            };
+            items.push_str(":");
+            items.push_signal(Signal::SpaceIfNotTrailing);
+            items.extend(parse_component_value(&plain.value));
+        }
+        raffia::ast::MediaFeature::Boolean(bool) => match &bool.name {
+            raffia::ast::MediaFeatureName::Ident(ident) => {
+                items.extend(parse_interpolable_ident(ident))
+            }
+        },
+        raffia::ast::MediaFeature::Range(range) => {
+            items.extend(parse_component_value(&range.left));
+            items.push_str(parse_media_feature_kind(&range.comparison.kind));
+            items.extend(parse_component_value(&range.right));
+        }
+        raffia::ast::MediaFeature::RangeInterval(range_interval) => {
+            items.extend(parse_component_value(&range_interval.left));
+            items.push_str(parse_media_feature_kind(
+                &range_interval.left_comparison.kind,
+            ));
+            match &range_interval.name {
+                raffia::ast::MediaFeatureName::Ident(ident) => {
+                    items.extend(parse_interpolable_ident(ident))
+                }
+            }
+            items.push_str(parse_media_feature_kind(
+                &range_interval.right_comparison.kind,
+            ));
+            items.extend(parse_component_value(&range_interval.right));
+        }
+    }
+    items
+}
+
+fn parse_media_feature_kind(media_feature_kind: &MediaFeatureComparisonKind) -> &str {
+    match media_feature_kind {
+        raffia::ast::MediaFeatureComparisonKind::LessThan => " < ",
+        raffia::ast::MediaFeatureComparisonKind::LessThanOrEqual => " <= ",
+        raffia::ast::MediaFeatureComparisonKind::GreaterThan => " > ",
+        raffia::ast::MediaFeatureComparisonKind::GreaterThanOrEqual => " >= ",
+        raffia::ast::MediaFeatureComparisonKind::Equal => " = ",
+    }
+}
+
+fn parse_combinator(combinator: &Combinator) -> PrintItems {
+    let mut items = PrintItems::new();
+    items.push_str(match combinator.kind {
+        raffia::ast::CombinatorKind::Descendant => " ",
+        raffia::ast::CombinatorKind::NextSibling => " + ",
+        raffia::ast::CombinatorKind::Child => " > ",
+        raffia::ast::CombinatorKind::LaterSibling => " ~ ",
+        raffia::ast::CombinatorKind::Column => " || ",
+    });
+    items
+}
+
+fn parse_wq_name(wq_name: &WqName) -> PrintItems {
+    let mut items = PrintItems::new();
+
+    if let Some(ns_prefix) = &wq_name.prefix {
+        items.extend(parse_ns_prefix(ns_prefix));
+    }
+    items.extend(parse_interpolable_ident(&wq_name.name));
+    items
+}
+
+fn parse_ns_prefix(ns_prefix: &NsPrefix) -> PrintItems {
+    let mut items = PrintItems::new();
+    if let Some(kind) = &ns_prefix.kind {
+        match kind {
+            raffia::ast::NsPrefixKind::Ident(ident) => {
+                items.extend(parse_interpolable_ident(ident))
+            }
+            raffia::ast::NsPrefixKind::Universal(_) => items.push_str("*"),
+        }
+        items.push_str("|");
     }
     items
 }

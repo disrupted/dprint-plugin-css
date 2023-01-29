@@ -881,11 +881,14 @@ fn parse_component_values(values: &[ComponentValue]) -> PrintItems {
     for (i, value) in values.iter().enumerate() {
         items.extend(parse_component_value(value));
         let next_node = values.get(i + 1);
-        match next_node {
-            None | Some(ComponentValue::Delimiter(_)) => (),
-            Some(ComponentValue::TokenWithSpan(next_token)) => {
+        match (value, next_node) {
+            (_, None | Some(ComponentValue::Delimiter(_))) => (),
+            (ComponentValue::TokenWithSpan(token), Some(_)) if token.token.is_comma() => {
+                items.push_signal(Signal::SpaceOrNewLine);
+            }
+            (_, Some(ComponentValue::TokenWithSpan(next_token))) => {
                 if next_token.span.start > value.span().end {
-                    items.push_signal(Signal::SpaceOrNewLine)
+                    items.push_signal(Signal::SpaceOrNewLine);
                 }
             }
             _ => items.push_signal(Signal::SpaceOrNewLine),

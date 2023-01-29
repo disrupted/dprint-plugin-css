@@ -12,7 +12,7 @@ div {
 
 [expect]
 div {
-    prop: rgba(255, 255, 255, 0.4);
+    prop: rgba(255, 255, 255, .4);
     prop: oklch(70% 0.1 9);
     prop: #eee;
     prop: #e3e4e5;

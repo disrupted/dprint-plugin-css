@@ -1014,7 +1014,7 @@ fn parse_dimension(dimension: &Dimension) -> PrintItems {
 
 fn parse_number(number: &Number) -> PrintItems {
     let mut items = PrintItems::new();
-    items.push_string(number.value.to_string());
+    items.push_string(number.raw.to_string());
     items
 }
 

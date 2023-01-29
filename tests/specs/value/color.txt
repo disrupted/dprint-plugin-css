@@ -18,6 +18,6 @@ div {
     prop: #e3e4e5;
     --custom1: rgba(255, 255, 255, 0.4);
     --custom2: oklch(70% 0.1 9);
-    --custom1: #eee;
-    --custom2: #e3e4e5;
+    --custom3: #eee;
+    --custom4: #e3e4e5;
 }

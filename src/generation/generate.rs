@@ -453,7 +453,7 @@ fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
                         }
                     },
                     raffia::ast::PseudoClassSelectorArg::Number(number) => {
-                        items.push_string(number.value.to_string())
+                        items.extend(parse_number(number))
                     }
                     raffia::ast::PseudoClassSelectorArg::RelativeSelectorList(
                         relative_selector_list,
@@ -881,11 +881,14 @@ fn parse_component_values(values: &[ComponentValue]) -> PrintItems {
     for (i, value) in values.iter().enumerate() {
         items.extend(parse_component_value(value));
         let next_node = values.get(i + 1);
-        match next_node {
-            None | Some(ComponentValue::Delimiter(_)) => (),
-            Some(ComponentValue::TokenWithSpan(next_token)) => {
+        match (value, next_node) {
+            (_, None | Some(ComponentValue::Delimiter(_))) => (),
+            (ComponentValue::TokenWithSpan(token), Some(_)) if token.token.is_comma() => {
+                items.push_signal(Signal::SpaceOrNewLine);
+            }
+            (_, Some(ComponentValue::TokenWithSpan(next_token))) => {
                 if next_token.span.start > value.span().end {
-                    items.push_signal(Signal::SpaceOrNewLine)
+                    items.push_signal(Signal::SpaceOrNewLine);
                 }
             }
             _ => items.push_signal(Signal::SpaceOrNewLine),
@@ -1011,7 +1014,7 @@ fn parse_dimension(dimension: &Dimension) -> PrintItems {
 
 fn parse_number(number: &Number) -> PrintItems {
     let mut items = PrintItems::new();
-    items.push_string(number.value.to_string());
+    items.push_string(number.raw.to_string());
     items
 }
 
@@ -1064,7 +1067,10 @@ fn parse_token_with_span(node: &TokenWithSpan) -> PrintItems {
         raffia::token::Token::ExclamationEqual(_) => items.push_str("!="),
         raffia::token::Token::GreaterThan(_) => items.push_str(">"),
         raffia::token::Token::GreaterThanEqual(_) => items.push_str(">="),
-        raffia::token::Token::Hash(_) => items.push_str("#"),
+        raffia::token::Token::Hash(hash) => {
+            items.push_str("#");
+            items.push_str(hash.raw);
+        }
         raffia::token::Token::HashLBrace(_) => items.push_str("#{"),
         raffia::token::Token::Ident(ident) => items.push_str(ident.raw),
         raffia::token::Token::Indent(_) => items.push_str("<indent>"),

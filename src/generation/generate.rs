@@ -1064,7 +1064,10 @@ fn parse_token_with_span(node: &TokenWithSpan) -> PrintItems {
         raffia::token::Token::ExclamationEqual(_) => items.push_str("!="),
         raffia::token::Token::GreaterThan(_) => items.push_str(">"),
         raffia::token::Token::GreaterThanEqual(_) => items.push_str(">="),
-        raffia::token::Token::Hash(_) => items.push_str("#"),
+        raffia::token::Token::Hash(hash) => {
+            items.push_str("#");
+            items.push_str(hash.raw);
+        }
         raffia::token::Token::HashLBrace(_) => items.push_str("#{"),
         raffia::token::Token::Ident(ident) => items.push_str(ident.raw),
         raffia::token::Token::Indent(_) => items.push_str("<indent>"),

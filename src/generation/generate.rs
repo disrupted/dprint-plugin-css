@@ -453,7 +453,7 @@ fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
                         }
                     },
                     raffia::ast::PseudoClassSelectorArg::Number(number) => {
-                        items.push_string(number.value.to_string())
+                        items.extend(parse_number(number))
                     }
                     raffia::ast::PseudoClassSelectorArg::RelativeSelectorList(
                         relative_selector_list,

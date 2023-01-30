@@ -1030,78 +1030,83 @@ fn parse_function(function: &Function) -> PrintItems {
 }
 
 fn parse_token_with_span(node: &TokenWithSpan) -> PrintItems {
+    use raffia::token::Token;
+
     let mut items = PrintItems::new();
     match &node.token {
-        raffia::token::Token::Eof(_) => items.push_str("<eof>"),
-        raffia::token::Token::Ampersand(_) => items.push_str("&"),
-        raffia::token::Token::Asterisk(_) => items.push_str("*"),
-        raffia::token::Token::AsteriskEqual(_) => items.push_str("*="),
-        raffia::token::Token::At(_) => items.push_str("@"),
-        raffia::token::Token::AtKeyword(_) => items.push_str("<at-keyword>"),
-        raffia::token::Token::AtLBraceVar(_) => items.push_str("@{"),
-        raffia::token::Token::BadStr(_) => items.push_str("<bad string>"),
-        raffia::token::Token::Bar(_) => items.push_str("|"),
-        raffia::token::Token::BarBar(_) => items.push_str("||"),
-        raffia::token::Token::BarEqual(_) => items.push_str("|="),
-        raffia::token::Token::CaretEqual(_) => items.push_str("^="),
-        raffia::token::Token::Cdc(_) => items.push_str("<CDC>"),
-        raffia::token::Token::Cdo(_) => items.push_str("<CDO>"),
-        raffia::token::Token::Colon(_) => items.push_str(":"),
-        raffia::token::Token::ColonColon(_) => items.push_str("::"),
-        raffia::token::Token::Comma(_) => items.push_str(","),
-        raffia::token::Token::Dedent(_) => items.push_str("<dedent>"),
-        raffia::token::Token::Dimension(dimension) => {
+        Token::Eof(_) => unreachable!(),
+        Token::Ampersand(_) => items.push_str("&"),
+        Token::Asterisk(_) => items.push_str("*"),
+        Token::AsteriskEqual(_) => items.push_str("*="),
+        Token::At(_) => items.push_str("@"),
+        Token::AtKeyword(at_keyword) => {
+            items.push_str("@");
+            items.push_str(at_keyword.ident.raw);
+        }
+        Token::AtLBraceVar(_) => items.push_str("@{"),
+        Token::BadStr(_) => unreachable!(),
+        Token::Bar(_) => items.push_str("|"),
+        Token::BarBar(_) => items.push_str("||"),
+        Token::BarEqual(_) => items.push_str("|="),
+        Token::CaretEqual(_) => items.push_str("^="),
+        Token::Cdc(_) => items.push_str("-->"),
+        Token::Cdo(_) => items.push_str("<!--"),
+        Token::Colon(_) => items.push_str(":"),
+        Token::ColonColon(_) => items.push_str("::"),
+        Token::Comma(_) => items.push_str(","),
+        Token::Dedent(_) => unreachable!(),
+        Token::Dimension(dimension) => {
             items.push_str(dimension.value.raw);
             items.push_str(dimension.unit.raw);
         }
-        raffia::token::Token::DollarEqual(_) => items.push_str("$="),
-        raffia::token::Token::DollarVar(var) => {
+        Token::DollarEqual(_) => items.push_str("$="),
+        Token::DollarVar(var) => {
             items.push_str("$");
             items.push_str(var.ident.raw);
         }
         raffia::token::Token::Dot(_) => items.push_str("."),
-        raffia::token::Token::DotDotDot(_) => items.push_str("..."),
-        raffia::token::Token::Equal(_) => items.push_str("="),
-        raffia::token::Token::EqualEqual(_) => items.push_str("=="),
-        raffia::token::Token::Exclamation(_) => items.push_str("!"),
-        raffia::token::Token::ExclamationEqual(_) => items.push_str("!="),
-        raffia::token::Token::GreaterThan(_) => items.push_str(">"),
-        raffia::token::Token::GreaterThanEqual(_) => items.push_str(">="),
-        raffia::token::Token::Hash(hash) => {
+        Token::DotDotDot(_) => items.push_str("..."),
+        Token::Equal(_) => items.push_str("="),
+        Token::EqualEqual(_) => items.push_str("=="),
+        Token::Exclamation(_) => items.push_str("!"),
+        Token::ExclamationEqual(_) => items.push_str("!="),
+        Token::GreaterThan(_) => items.push_str(">"),
+        Token::GreaterThanEqual(_) => items.push_str(">="),
+        Token::Hash(hash) => {
             items.push_str("#");
             items.push_str(hash.raw);
         }
-        raffia::token::Token::HashLBrace(_) => items.push_str("#{"),
-        raffia::token::Token::Ident(ident) => items.push_str(ident.raw),
-        raffia::token::Token::Indent(_) => items.push_str("<indent>"),
-        raffia::token::Token::LBrace(_) => items.push_str("{"),
-        raffia::token::Token::LBracket(_) => items.push_str("["),
-        raffia::token::Token::LessThan(_) => items.push_str("<"),
-        raffia::token::Token::LessThanEqual(_) => items.push_str("<="),
-        raffia::token::Token::Linebreak(_) => items.push_str("\n"),
-        raffia::token::Token::LParen(_) => items.push_str("("),
-        raffia::token::Token::Minus(_) => items.push_str("-"),
-        raffia::token::Token::Number(number) => items.push_str(number.raw),
-        raffia::token::Token::NumberSign(_) => items.push_str("#"),
-        raffia::token::Token::Percent(_) => items.push_str("%"),
-        raffia::token::Token::Percentage(percentage) => {
+        Token::HashLBrace(_) => items.push_str("#{"),
+        Token::Ident(ident) => items.push_str(ident.raw),
+        Token::Indent(_) => unreachable!(),
+        Token::LBrace(_) => items.push_str("{"),
+        Token::LBracket(_) => items.push_str("["),
+        Token::LessThan(_) => items.push_str("<"),
+        Token::LessThanEqual(_) => items.push_str("<="),
+        Token::Linebreak(_) => items.push_signal(Signal::NewLine),
+        Token::LParen(_) => items.push_str("("),
+        Token::Minus(_) => items.push_str("-"),
+        Token::Number(number) => items.push_str(number.raw),
+        Token::NumberSign(_) => items.push_str("#"),
+        Token::Percent(_) => items.push_str("%"),
+        Token::Percentage(percentage) => {
             items.push_str(percentage.value.raw);
             items.push_str("%");
         }
-        raffia::token::Token::Plus(_) => items.push_str("+"),
-        raffia::token::Token::PlusUnderscore(_) => items.push_str("+_"),
-        raffia::token::Token::Question(_) => items.push_str("?"),
-        raffia::token::Token::RBrace(_) => items.push_str("}"),
-        raffia::token::Token::RBracket(_) => items.push_str("]"),
-        raffia::token::Token::RParen(_) => items.push_str(")"),
-        raffia::token::Token::Semicolon(_) => items.push_str(";"),
-        raffia::token::Token::Solidus(_) => items.push_str("\\"),
-        raffia::token::Token::Str(str) => items.push_str(str.raw),
-        raffia::token::Token::StrTemplate(str_template) => items.push_str(str_template.raw),
-        raffia::token::Token::Tilde(_) => items.push_str("~"),
-        raffia::token::Token::TildeEqual(_) => items.push_str("~="),
-        raffia::token::Token::UrlRaw(url_raw) => items.push_str(url_raw.raw),
-        raffia::token::Token::UrlTemplate(url_template) => items.push_str(url_template.raw),
+        Token::Plus(_) => items.push_str("+"),
+        Token::PlusUnderscore(_) => items.push_str("+_"),
+        Token::Question(_) => items.push_str("?"),
+        Token::RBrace(_) => items.push_str("}"),
+        Token::RBracket(_) => items.push_str("]"),
+        Token::RParen(_) => items.push_str(")"),
+        Token::Semicolon(_) => items.push_str(";"),
+        Token::Solidus(_) => items.push_str("/"),
+        Token::Str(str) => items.push_str(str.raw),
+        Token::StrTemplate(str_template) => items.push_str(str_template.raw),
+        Token::Tilde(_) => items.push_str("~"),
+        Token::TildeEqual(_) => items.push_str("~="),
+        Token::UrlRaw(url_raw) => items.push_str(url_raw.raw),
+        Token::UrlTemplate(url_template) => items.push_str(url_template.raw),
     };
     items
 }

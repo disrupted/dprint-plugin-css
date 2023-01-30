@@ -685,6 +685,12 @@ fn parse_supports_in_parens(supports_in_parens: &SupportsInParens) -> PrintItems
         SupportsInParens::Feature(feature) => {
             items.extend(gen_declaration_instruction(&feature.decl, true));
         }
+        SupportsInParens::Selector(selector) => {
+            items.extend(gen_selector_list(selector));
+        }
+        SupportsInParens::Function(function) => {
+            items.extend(parse_function(function));
+        }
     }
     items.push_str(")");
     items

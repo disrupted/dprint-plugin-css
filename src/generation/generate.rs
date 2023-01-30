@@ -433,7 +433,7 @@ fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
                     raffia::ast::PseudoClassSelectorArg::Nth(nth) => match nth {
                         raffia::ast::Nth::Odd(odd) => items.push_str(&odd.name),
                         raffia::ast::Nth::Even(even) => items.push_str(&even.name),
-                        raffia::ast::Nth::Integer(int) => items.push_string(int.value.to_string()),
+                        raffia::ast::Nth::Integer(int) => items.push_str(int.raw),
                         raffia::ast::Nth::AnPlusB(an_plus_b) => {
                             if an_plus_b.a.is_negative() {
                                 items.push_str("-");

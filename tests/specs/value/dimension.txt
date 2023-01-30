@@ -20,31 +20,19 @@ div { frequency: 14.44kHz; }
 
 [expect]
 a {
-    width: 0em;
+    width: .0em;
 }
 
 a {
-    width: 0em;
+    width: .00em;
 }
 
 a {
-    width: 0.1em;
+    width: .10em;
 }
 
 a {
-    width: 0em;
-}
-
-a {
-    width: 0.1em;
-}
-
-a {
-    width: 0em;
-}
-
-a {
-    width: 0em;
+    width: 0.0em;
 }
 
 a {
@@ -52,27 +40,39 @@ a {
 }
 
 a {
-    width: 0em;
+    width: +.0em;
 }
 
 a {
-    width: 0.1em;
+    width: +.00em;
 }
 
 a {
-    width: -0em;
+    width: +.10em;
 }
 
 a {
-    width: -0em;
+    width: +0.0em;
 }
 
 a {
-    width: -0.1em;
+    width: +0.1em;
 }
 
 a {
-    width: -0em;
+    width: -.0em;
+}
+
+a {
+    width: -.00em;
+}
+
+a {
+    width: -.10em;
+}
+
+a {
+    width: -0.0em;
 }
 
 a {

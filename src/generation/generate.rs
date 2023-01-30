@@ -981,7 +981,7 @@ fn parse_dimension(dimension: &Dimension) -> PrintItems {
     let mut items = PrintItems::new();
     match dimension {
         Dimension::Length(len) => {
-            items.push_string(len.value.value.to_string());
+            items.push_str(len.value.raw);
             items.push_str(&len.unit.name);
         }
         Dimension::Angle(angle) => {

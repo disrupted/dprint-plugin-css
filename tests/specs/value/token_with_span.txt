@@ -1,0 +1,9 @@
+== should format token with span ==
+a {
+    --custom: <!-- --> @at / a 5px [ ];
+}
+
+[expect]
+a {
+    --custom: <!-- --> @at / a 5px [ ];
+}

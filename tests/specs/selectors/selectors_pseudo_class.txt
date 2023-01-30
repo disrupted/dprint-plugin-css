@@ -223,19 +223,19 @@ a:hOvEr {}
 
 :nth-child(0) {}
 
-:nth-child(0) {}
+:nth-child(+0) {}
 
 :nth-child(-0) {}
 
 :nth-child(1) {}
 
-:nth-child(1) {}
+:nth-child(+1) {}
 
 :nth-child(-1) {}
 
 :nth-child(3) {}
 
-:nth-child(3) {}
+:nth-child(+3) {}
 
 :nth-child(-3) {}
 

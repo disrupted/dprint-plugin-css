@@ -279,7 +279,7 @@ fn gen_keyframe_block(node: KeyframeBlock) -> PrintItems {
                 items.extend(parse_interpolable_ident(ident))
             }
             raffia::ast::KeyframeSelector::Percentage(percentage) => {
-                items.push_string(percentage.value.value.to_string());
+                items.push_str(percentage.value.raw);
                 items.push_str("%");
             }
         }
@@ -433,7 +433,7 @@ fn gen_selector_instruction(simple_selector: &SimpleSelector) -> PrintItems {
                     raffia::ast::PseudoClassSelectorArg::Nth(nth) => match nth {
                         raffia::ast::Nth::Odd(odd) => items.push_str(&odd.name),
                         raffia::ast::Nth::Even(even) => items.push_str(&even.name),
-                        raffia::ast::Nth::Integer(int) => items.push_string(int.value.to_string()),
+                        raffia::ast::Nth::Integer(int) => items.push_str(int.raw),
                         raffia::ast::Nth::AnPlusB(an_plus_b) => {
                             if an_plus_b.a.is_negative() {
                                 items.push_str("-");
@@ -935,7 +935,7 @@ fn parse_component_value(value: &ComponentValue) -> PrintItems {
         }
         ComponentValue::Number(node) => items.extend(parse_number(node)),
         ComponentValue::Percentage(node) => {
-            items.push_string(node.value.value.to_string());
+            items.push_str(node.value.raw);
             items.push_str("%");
         }
         ComponentValue::Ratio(node) => items.extend(parse_ratio(node)),
@@ -987,31 +987,31 @@ fn parse_dimension(dimension: &Dimension) -> PrintItems {
     let mut items = PrintItems::new();
     match dimension {
         Dimension::Length(len) => {
-            items.push_string(len.value.value.to_string());
+            items.push_str(len.value.raw);
             items.push_str(&len.unit.name);
         }
         Dimension::Angle(angle) => {
-            items.push_string(angle.value.value.to_string());
+            items.push_str(angle.value.raw);
             items.push_str(&angle.unit.name);
         }
         Dimension::Duration(duration) => {
-            items.push_string(duration.value.value.to_string());
+            items.push_str(duration.value.raw);
             items.push_str(&duration.unit.name);
         }
         Dimension::Frequency(frequency) => {
-            items.push_string(frequency.value.value.to_string());
+            items.push_str(frequency.value.raw);
             items.push_str(&frequency.unit.name);
         }
         Dimension::Resolution(resolution) => {
-            items.push_string(resolution.value.value.to_string());
+            items.push_str(resolution.value.raw);
             items.push_str(&resolution.unit.name);
         }
         Dimension::Flex(flex) => {
-            items.push_string(flex.value.value.to_string());
+            items.push_str(flex.value.raw);
             items.push_str(&flex.unit.name);
         }
         Dimension::Unknown(unknown) => {
-            items.push_string(unknown.value.value.to_string());
+            items.push_str(unknown.value.raw);
             items.push_str(&unknown.unit.name);
         }
     }

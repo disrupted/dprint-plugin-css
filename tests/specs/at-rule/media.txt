@@ -476,7 +476,7 @@
 
 @media (resolution: 3dpi), not all and (resolution: 3dpi) {}
 
-@media (resolution: 3dpi), not all and (resolution: 3dpi) {}
+@media (resolution: 3.0dpi), not all and (resolution: 3.0dpi) {}
 
 @media (resolution: 120dpcm), not all and (resolution: 120dpcm) {}
 

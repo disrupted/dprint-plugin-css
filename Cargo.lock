@@ -114,9 +114,9 @@ dependencies = [
 
 [[package]]
 name = "raffia"
-version = "0.1.0"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "44058cde82d05189b00bf8aa6f4a94cad23e650c0ac3692c24b2dcbd29828e2d"
+checksum = "01bead7e11e627674a79d3d2cf026a478c5115df3fdf0b3380d05aa1a4160d10"
 dependencies = [
  "raffia_macro",
  "smallvec",
@@ -199,9 +199,9 @@ checksum = "1ad1d488a557b235fc46dae55512ffbfc429d2482b08b4d9435ab07384ca8aec"
 
 [[package]]
 name = "smallvec"
-version = "1.9.0"
+version = "1.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2fd0db749597d91ff862fd1d55ea87f7855a744a8425a64695b6fca237d1dad1"
+checksum = "a507befe795404456341dfab10cef66ead4c041f62b8b11bbb92bffe5d0953e0"
 dependencies = [
  "serde",
 ]

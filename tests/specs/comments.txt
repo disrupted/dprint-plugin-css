@@ -1,0 +1,22 @@
+== should format layer value ==
+
+.rule {
+  /* NOTE: this comment should stay inside the rule */
+  max-width: 10ch;
+}
+
+/* NOTE: this comment should stay right above the rule2 */
+.rule2 {
+  color: pink;
+}
+
+[expect]
+.rule {
+  /* NOTE: this comment should stay inside the rule */
+  max-width: 10ch;
+}
+
+/* NOTE: this comment should stay right above the rule2 */
+.rule2 {
+  color: pink;
+}

@@ -1,2 +1,3 @@
 /target
 deployment/npm/node_modules
+deployment/npm/plugin.wasm

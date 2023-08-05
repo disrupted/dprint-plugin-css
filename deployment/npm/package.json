@@ -14,7 +14,7 @@
     "formatter",
     "dprint"
   ],
-  "author": "David Sherret",
+  "author": "Salomon Popp",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/disrupted/dprint-plugin-css/issues"

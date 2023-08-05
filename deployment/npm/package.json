@@ -1,0 +1,29 @@
+{
+  "name": "dprint-plugin-css",
+  "version": "0.0.0",
+  "description": "Wasm module for dprint-plugin-css.",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/disrupted/dprint-plugin-css.git"
+  },
+  "keywords": [
+    "css",
+    "code",
+    "formatter",
+    "dprint"
+  ],
+  "author": "Salomon Popp",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/disrupted/dprint-plugin-css/issues"
+  },
+  "homepage": "https://github.com/disrupted/dprint-plugin-css#readme",
+  "scripts": {
+    "test": "node index.test.js"
+  },
+  "devDependencies": {
+    "@dprint/formatter": "~0.1.4"
+  }
+}
